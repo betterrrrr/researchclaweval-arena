@@ -24,7 +24,7 @@ MODE="full"
 TARGET="$ROOT"
 if [[ "${1:-}" == "--path" ]]; then
   MODE="path"
-  TARGET="${2:?--path requires a directory}"
+  TARGET="$(cd "${2:?--path requires a directory}" && pwd)"
 fi
 
 failed=0
@@ -47,12 +47,14 @@ list_files() {
 }
 
 is_exempt() {
+  # full mode passes repo-relative paths; path mode passes absolute paths,
+  # which are converted to repo-relative here before matching
   local rel="$1"
+  rel="${rel#"$TARGET"/}"
+  rel="${rel#./}"
   local e
   for e in "${EXEMPT[@]}"; do
     [[ "$rel" == "$e" ]] && return 0
-    # --path mode prints absolute paths - also match on suffix
-    [[ "$e" == */"$rel" ]] && return 0
   done
   # split manifest files are protocol DATA — their record counts are ordinary
   # numbers, not internal matrix statistics
@@ -132,10 +134,10 @@ scan_text() {
   local f rel
   while IFS= read -r f; do
     [[ -n "$f" ]] || continue
-    rel="${f#$TARGET/}"; [[ "$MODE" == "path" ]] && rel="$f"
+    rel="${f#$TARGET/}"
     if is_exempt "$rel"; then continue; fi
     if grep -qP "$pattern" "$f" 2>/dev/null; then
-      echo "  $rel" >&2
+      echo "  ${rel#./}" >&2
       found=1
     fi
   done
@@ -155,7 +157,7 @@ done
 # .gitignore where '.codex/' is a legitimate local-tool dir rule
 for f in $(list_files); do
   [[ -n "$f" ]] || continue
-  rel="${f#$TARGET/}"
+  rel="${f#"$TARGET"/}"; rel="${rel#./}"
   if is_exempt "$rel"; then continue; fi
   case "$rel" in docs/rules.md|.gitignore) continue ;; esac
   if grep -q 'codex' "$f" 2>/dev/null; then echo "  $rel"; fi
@@ -170,7 +172,7 @@ fi
 # recommendation in §4); rejected everywhere else
 found_ds=$(list_files | while IFS= read -r f; do
   [[ -n "$f" ]] || continue
-  rel="${f#$TARGET/}"
+  rel="${f#"$TARGET"/}"; rel="${rel#./}"
   if is_exempt "$rel"; then continue; fi
   case "$rel" in docs/rules.md) continue ;; esac
   if grep -qi 'deepseek' "$f" 2>/dev/null; then echo "  $rel"; fi
@@ -187,7 +189,7 @@ if [[ -f "$TARGET/scripts/forbidden-hosts.txt" ]]; then
     [[ -n "$host" ]] || continue
     hits=$(list_files | while IFS= read -r f; do
       [[ -n "$f" ]] || continue
-      rel="${f#$TARGET/}"
+      rel="${f#"$TARGET"/}"; rel="${rel#./}"
       if is_exempt "$rel"; then continue; fi
       if grep -qi "$host" "$f" 2>/dev/null; then echo "  $rel"; fi
     done)
