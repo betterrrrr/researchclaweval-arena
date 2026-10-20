@@ -1,0 +1,56 @@
+name: New framework adapter
+description: Register a research-agent framework for the competition
+title: "adapter: <framework name>"
+labels: [adapter]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill in the TODO fields of `templates/example-adapter/manifest.json`
+        and link the resulting manifest. See `docs/participant_quickstart.md`.
+  - type: input
+    id: framework_id
+    attributes:
+      label: Framework id (assigned by the organizer)
+      placeholder: "NN"
+    validations:
+      required: true
+  - type: input
+    id: framework_name
+    attributes:
+      label: Framework name
+    validations:
+      required: true
+  - type: input
+    id: upstream
+    attributes:
+      label: Upstream repository URL
+      placeholder: "https://github.com/..."
+    validations:
+      required: true
+  - type: textarea
+    id: entrypoint
+    attributes:
+      label: Native entrypoint
+      description: The documented official CLI/skill/runner your framework must be launched through
+    validations:
+      required: true
+  - type: dropdown
+    id: topics
+    attributes:
+      label: Supported topics
+      multiple: true
+      options:
+        - tdc_admet_tox
+        - psydefdetect
+        - arc_wbe_2026
+    validations:
+      required: true
+  - type: checkboxes
+    id: native
+    attributes:
+      label: Native-execution guarantees
+      options:
+        - label: The framework prints FRAMEWORK_NATIVE_LOG_MARKER from inside its own execution
+        - label: The framework reads OPENAI_BASE_URL / OPENAI_API_KEY / OPENAI_MODEL from the injected environment only
+        - label: The framework owns ideation, experiments, comparison, selection, and final report

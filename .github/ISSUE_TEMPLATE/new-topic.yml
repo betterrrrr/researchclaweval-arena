@@ -1,0 +1,45 @@
+name: New topic proposal
+description: Propose adding a task to the community leaderboard
+title: "topic: <task name>"
+labels: [topic]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        New topics are evaluated against the same discipline as the current
+        three (docs/rules.md): public data with verifiable sha256, a frozen
+        official scorer, a publication-safe license, and a computable
+        objective metric.
+  - type: input
+    id: name
+    attributes:
+      label: Topic name and id (lowercase underscore id)
+    validations:
+      required: true
+  - type: input
+    id: dataset
+    attributes:
+      label: Dataset source + license
+    validations:
+      required: true
+  - type: input
+    id: metric
+    attributes:
+      label: Official metric and direction
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: Sketch of the runtime contract
+      description: data visibility, compute budget, experiment count, payload format
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Admission checklist
+      options:
+        - label: Public dataset obtainable without the organizer redistributing it
+        - label: License allows the use the leaderboard intends
+        - label: A frozen official scorer exists or will be pinned before admission

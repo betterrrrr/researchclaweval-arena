@@ -1,0 +1,9 @@
+# Forbidden host / endpoint markers — case-insensitive substrings.
+# Anything matching here fails scripts/check-release.sh.
+# (hf-mirror.com is intentionally NOT listed: it is a public mirror that the
+# competition rules themselves reference in docs/rules.md §3.2.)
+paratera
+bianxie
+moonshot
+host.docker.internal
+researchclaweval.dev

@@ -1,0 +1,11 @@
+# Template provider config — fill at runtime; never commit real credentials.
+# api_key and model are injected via environment (OPENAI_API_KEY / OPENAI_MODEL)
+# and validated non-empty at runtime (rules §4).
+
+[provider]
+name = "replace-me-provider"
+
+[endpoint]
+base_url = "replace-me-base-url"
+api_key = ""
+model = ""

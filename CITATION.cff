@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this evaluation suite in research, please cite it."
+title: "ResearchClawEval Arena — Evaluation Suite for Research-Agent Frameworks"
+abstract: >-
+  Public evaluation protocol for research-agent frameworks on three real
+  scientific tasks (TDC-ADMET-Tox, PsyDefDetect, ARC-WBE-2026): frozen task
+  contracts, official-scorer glue, dataset setup with sha256 verification,
+  submission templates, and a long-term community-leaderboard metric system.
+  No datasets are redistributed; no results are published with the protocol.
+authors:
+  - name: ResearchClawEval Arena contributors
+keywords:
+  - research-agent
+  - evaluation
+  - benchmark
+  - shared task
+  - LLM judge
+date-released: "2026-10-20"
+license: MIT

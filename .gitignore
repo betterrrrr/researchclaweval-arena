@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+dist/
+build/
+
+# Credentials — real provider configs must never be tracked
+.env
+.env.*
+!.env.example
+provider.*.toml
+!provider.example.toml
+*.local.toml
+opencode.json*
+api/
+
+# Runs and results (contract-only repo; keep results/README.md)
+runs/
+runs_*/
+artifacts/
+out/
+results/*
+!results/README.md
+logs/
+*.score.json
+score.json
+leaderboard/results.json
+*.parquet
+*.safetensors
+*.bin
+*.pt
+*.db
+*.sqlite*
+
+# Curated-out internal automation trees
+automation/
+real_eval/
+
+# Machine-local data and tooling state
+data/
+external/
+recovery/
+.framework-refresh/
+.sdd/
+.claude/
+.codex/
+.cursor/
+.idea/
+.vscode/
+*.swp
+.DS_Store
