@@ -79,6 +79,13 @@ self-implemented metrics, and wrong splits are all rejection grounds
 
 ## Tooling
 
+**Q: Is there a download bundle for participants?**
+Yes — the GitHub releases carry `researchclaweval-arena-<version>.zip` /
+`.tar.gz` (exact copies of the tagged tree, verified sha256 in the release
+notes). Unzip anywhere, run `bash scripts/setup_datasets.sh`, and follow
+`docs/participant_quickstart.md`. Datasets are never bundled — you download
+and verify them yourself.
+
 **Q: What is the runner?**
 A template wrapper (`scripts/runner/`) that mounts contract + dataset
 read-only, injects the model env, runs your framework natively in a fresh
