@@ -51,6 +51,8 @@ is_exempt() {
   local e
   for e in "${EXEMPT[@]}"; do
     [[ "$rel" == "$e" ]] && return 0
+    # --path mode prints absolute paths - also match on suffix
+    [[ "$e" == */"$rel" ]] && return 0
   done
   # split manifest files are protocol DATA — their record counts are ordinary
   # numbers, not internal matrix statistics
