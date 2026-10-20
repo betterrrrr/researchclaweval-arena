@@ -102,7 +102,7 @@ P=(
   # G5 — organizer-internal model lineage (gpt-5/6 · deepseek · kimi · luna);
   # generic public product names (claude, codex, llama, qwen, ...) are NOT
   # banned — they legitimately appear in tool dirs and participant docs.
-  '\b(gpt-?5|gpt-?6|deepseek|kimi|luna)\b'
+  '\b(gpt-?5|gpt-?6|kimi|luna)\b'
   '\b(fullpipe|intake_0102|judge_0102|admission_probe|candidate-run)\b'
   # domains / endpoints
   '\bparatera\b|\bbianxie\b|\bmoonshot\b|\bhost\.docker\.internal\b|\bresearchclaweval\.dev\b'
@@ -154,6 +154,21 @@ done | tee /tmp/rce-codex-hits.txt
 if [[ -s /tmp/rce-codex-hits.txt ]]; then
   echo "FINDING: 'codex' outside docs/rules.md and .gitignore:" >&2
   cat /tmp/rce-codex-hits.txt >&2
+  failed=1
+fi
+
+# deepseek — allowed ONLY in docs/rules.md (the published self-test model
+# recommendation in §4); rejected everywhere else
+found_ds=$(list_files | while IFS= read -r f; do
+  [[ -n "$f" ]] || continue
+  rel="${f#$TARGET/}"
+  if is_exempt "$rel"; then continue; fi
+  case "$rel" in docs/rules.md) continue ;; esac
+  if grep -qi 'deepseek' "$f" 2>/dev/null; then echo "  $rel"; fi
+done)
+if [[ -n "$found_ds" ]]; then
+  echo "FINDING: 'deepseek' outside docs/rules.md:" >&2
+  echo "$found_ds" >&2
   failed=1
 fi
 

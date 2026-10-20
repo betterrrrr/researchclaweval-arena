@@ -13,9 +13,13 @@ No. The main board is three columns, one ranking per task. The three metrics
 merged without calibration artifacts dominating the result — see rules §6.3.
 
 **Q: Who provides the model?**
-The organizer, injected via `OPENAI_BASE_URL` / `OPENAI_API_KEY` /
-`OPENAI_MODEL`. Bringing your own model or endpoint is grounds for rejection.
-This is a framework contest, not a model contest (rules §4).
+Two stages. Self-testing (before submission): you bring your own model —
+the organizer does not restrict it (rules §4 recommends one that behaves
+closest to the official environment). Official evaluation (submission
+scoring): the organizer injects the model via `OPENAI_BASE_URL` /
+`OPENAI_API_KEY` / `OPENAI_MODEL`; bringing your own model or endpoint at
+that stage is grounds for rejection. This is a framework contest, not a
+model contest (rules §4).
 
 **Q: Why is there no judge/LLM-scoring on the board?**
 The competition board uses objective official scores only. The 7-dimension

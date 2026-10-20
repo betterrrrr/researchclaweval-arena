@@ -37,7 +37,7 @@
 | 参赛单元 | 一个 research-agent 框架 |
 | topic | **3 个，全部公开**：`tdc_admet_tox` / `psydefdetect` / `arc_wbe_2026` |
 | 交付物 | **开源仓库**（框架源码）+ 每个 topic 一份产物（§5） |
-| 模型 | 由主办方统一提供（§4） |
+| 模型 | 自测自带、正式测评由主办方统一提供（§4） |
 | 实验次数 | 沿用 harness 的 **2–4 次**（`experiment_budget`），不额外限定 |
 
 **不设隐藏集，也不宣称保密。** 参赛者可以在提交前无限次调试——这是设计，不是漏洞。
@@ -94,18 +94,22 @@ arc 是唯一不给框架真值的 topic——官方指标要比对真激活，�
 
 ---
 
-## §4 统一模型
+## §4 模型
 
-所有框架必须通过主办方注入的环境变量访问模型：
+**两阶段、两种供给**：
 
-```
-OPENAI_BASE_URL / OPENAI_API_KEY / OPENAI_MODEL
-```
+| 阶段 | 模型来源 | 说明 |
+|---|---|---|
+| **自测阶段**（提交前，可无限次迭代） | **参赛者自带** | 主办方不干预、不限制；推荐 `deepseek-v4.1-flash`（与正式测评环境行为最接近），不强制 |
+| **正式测评**（提交后，主办方统一评分） | **主办方统一注入** | 经 `OPENAI_BASE_URL / OPENAI_API_KEY / OPENAI_MODEL` 注入；框架不得自带模型或 base_url |
+
+通用规则（两阶段一致）：
 
 | 规则 | 说明 |
 |---|---|
+| 代码不得硬编码 endpoint 或模型 ID | 模型访问一律走环境变量：自测阶段设你自己的值，正式测评阶段由主办方覆盖 |
 | 模型 ID 由主办方公示，**大小写敏感** | 写错会报 `no healthy deployments` |
-| **禁止自带模型或自带 base_url** | `framework_internal_model` 与公示值不符即不受理 |
+| **正式测评禁止自带模型或自带 base_url** | `framework_internal_model` 与公示值不符即不受理 |
 | `framework_internal_api_base_url` 一并核对 | 两个字段都是现成的 trace 契约 |
 
 ---

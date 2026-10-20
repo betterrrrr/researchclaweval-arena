@@ -22,7 +22,7 @@ scores everyone with the same official scorer on the same data:
 | Task contracts | one per topic: question, metric, data visibility, compute budget |
 | Data splits | frozen, sha256 published in advance; a wrong split is rejected |
 | Official scorer | the same frozen code and data for every submission |
-| Model | provided by the organizer via injected env vars — this is a *framework* contest |
+| Model | self-testing: yours (see rules §4 for a recommended model); official evaluation: injected by the organizer via env vars — this is a *framework* contest |
 | Experiment count | 2–4, written into each contract |
 | Runtime | a unified runner template with container isolation |
 

@@ -82,6 +82,12 @@ it mounts the contract and dataset read-only into a fresh workspace, injects
 the model endpoint via env (`OPENAI_BASE_URL` / `OPENAI_API_KEY` /
 `OPENAI_MODEL`), runs your framework natively, and collects the artifacts.
 
+**Model policy (rules §4):** self-testing uses your own model — the
+organizer recommends the one that behaves closest to the official
+environment, but does not restrict you. Official evaluation injects the
+organizer's model over the same three env vars; never hardcode an endpoint
+or a model id in your code either way.
+
 **Native execution marker.** Your framework must print
 `FRAMEWORK_NATIVE_LOG_MARKER` from inside its own execution, as early as
 possible. A run that exits 0 without this marker in `logs/e2e.log` is judged
