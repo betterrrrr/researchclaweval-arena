@@ -1,0 +1,97 @@
+# FAQ
+
+## The competition
+
+**Q: Are the tasks hidden?**
+No. All three tasks are public benchmarks, fully disclosed. You may iterate
+as many times as you like before submitting; there is no hidden set and no
+secret split. That is deliberate — see `docs/rules.md` §0 and §2.
+
+**Q: Is the leaderboard a single merged score?**
+No. The main board is three columns, one ranking per task. The three metrics
+(0.5–1.0 AUROC, ~0.1–0.3 macro-F1, arc across orders of magnitude) cannot be
+merged without calibration artifacts dominating the result — see rules §6.3.
+
+**Q: Who provides the model?**
+The organizer, injected via `OPENAI_BASE_URL` / `OPENAI_API_KEY` /
+`OPENAI_MODEL`. Bringing your own model or endpoint is grounds for rejection.
+This is a framework contest, not a model contest (rules §4).
+
+**Q: Why is there no judge/LLM-scoring on the board?**
+The competition board uses objective official scores only. The 7-dimension
+LLM judge and ED belong to the long-term community leaderboard: they are
+noisy, expensive, and in a submit-artifacts mode they would measure evidence
+quality rather than execution (rules §6.2, appendix A).
+
+## Data
+
+**Q: Where do I get the data?**
+You download it yourself and verify sha256 — `scripts/setup_datasets.sh`.
+The organizer does not redistribute datasets (rules §3.2). If
+`huggingface.co` is unreachable, set `HF_ENDPOINT=https://hf-mirror.com`.
+
+**Q: Is PsyDefDetect really usable?**
+Yes, under `cc-by-nc-4.0`. The competition is organized for non-commercial
+purposes; make sure your own use complies before downloading.
+
+**Q: What split do I have to use?**
+The frozen canonical splits. `split_sha256` must match byte for byte; any
+re-splitting is a rejection. For PsyDefDetect the canonical split is a
+dialogue-level, leakage-free split distinct from the dataset's official
+record-level one (rules §3.3).
+
+## Scoring
+
+**Q: My TDC score is exactly 0.**
+Check `predictions.csv` `sample_id` values against `public/test.csv` —
+`sample_id` must be taken verbatim from that file, never re-built
+(`hERG` endpoint → `HERG_` prefix). One mismatched id → zero matches and a
+zero score (rules §5.6).
+
+**Q: My ARC estimator was rejected.**
+The official adapter fails closed: `predict(self, mlp)` must return a real
+`(32, 256)` float array. Constants, broadcast, scalar, zero-filled,
+placeholder, or pasted log outputs are inadmissible (§5.3, 6.4 of the ARC
+contract). Also check the signature — some estimators omit the `budget`
+parameter; the adapter probes the signature and supports both.
+
+**Q: Why doesn't my ARC run have `b0`/`bT`?**
+ARC is the one topic without a truth value for the framework. Numeric
+`framework_visible_validation` self-evaluation records in
+`experiment_trace.json` are required to compute those (rules §3.4); without
+them the extended dimensions fall back to the judge's ordinal path.
+
+**Q: My run exited 0 but scored nothing.**
+Most likely the native marker is missing: `FRAMEWORK_NATIVE_LOG_MARKER` must
+be printed by *your framework's own execution* into the run log, early in the
+run (rules §5.5). A wrapper printing it on the framework's behalf is judged
+non-native.
+
+**Q: Can I submit a self-computed score?**
+No. Self-reported scores never enter the board — placeholder values,
+self-implemented metrics, and wrong splits are all rejection grounds
+(rules §6.1, §8).
+
+## Tooling
+
+**Q: What is the runner?**
+A template wrapper (`scripts/runner/`) that mounts contract + dataset
+read-only, injects the model env, runs your framework natively in a fresh
+workspace, and collects `logs/e2e.log` and the artifacts. You must use it
+rather than your own ad-hoc orchestration so the artifacts are attributable
+(rules §5.4).
+
+**Q: What goes into the adapter manifest?**
+`templates/example-adapter/manifest.json` — validated against
+`schemas/adapter.schema.json` (framework id, name, upstream repo, license,
+native entrypoint, required env/images, patches). Fill every TODO, that's
+the entire integration surface.
+
+**Q: Does the judge pipeline need a key from me?**
+The judge runs organizer-side. The code reads `JUDGE_API_KEY` /
+`JUDGE_MODEL` / `JUDGE_BASE_URL` from the environment; there are no secrets
+and no default model id in the source.
+
+**Q: I found a bug in a scorer glue script.**
+Open an issue with the topic, the script name, and a minimal reproduction.
+Do not email raw dataset files or keys to anyone.
