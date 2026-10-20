@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "updated": "2026-10-20",
+  "note": [
+    "Anchors used to normalize b0/bT for the long-term community leaderboard.",
+    "These are conventions calibrated by the organizer, NOT authoritative baselines.",
+    "Any citation must carry that caveat (docs/metric-system.md §3)."
+  ],
+  "topics": {
+    "arc": {
+      "status": "ready",
+      "direction": "lower_better",
+      "worst": 0.075,
+      "best": 1e-06,
+      "scale": "log",
+      "labels": ["random-level estimator", "near-perfect estimator"],
+      "source": "ARC-WBE starterkit official calibration table"
+    },
+    "psydef": {
+      "status": "ready",
+      "direction": "higher_better",
+      "worst": 0.125,
+      "best": 1.0,
+      "scale": "linear",
+      "labels": ["random over 8 positive classes", "perfect macro-F1"],
+      "source": "labels 1-8 macro-F1 contract (contracts/psydefdetect_contract.md)"
+    },
+    "tdc": {
+      "status": "ready",
+      "direction": "higher_better",
+      "worst": 0.5,
+      "best": 1.0,
+      "scale": "linear",
+      "labels": ["random AUROC", "perfect AUROC"],
+      "source": "macro average of AMES/hERG/DILI AUROC (contracts/tdc_admet_tox_contract.md)"
+    }
+  }
+}
