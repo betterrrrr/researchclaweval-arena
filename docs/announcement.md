@@ -83,7 +83,7 @@ export RUN_ROOT=/tmp/my-run
 bash scripts/runner/<your-id>_<your-framework>_<topic>_fullrun.sh
 ```
 
-跑完你会得到：研究计划、实验轨迹、最终报告、完整日志，以及**官方评分器算出的分数**。
+跑完你会得到：研究计划、实验轨迹、最终报告、完整日志，以及topic 对应的分数——psydef 可立即用本地评分器自测出分；tdc/arc 的官方分由主办方在提交后统一给出（规则 §6.1）。
 
 **完整流程见 [`docs/participant_quickstart.md`](participant_quickstart.md)。**
 

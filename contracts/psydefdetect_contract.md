@@ -13,7 +13,7 @@ Build methods for the PsyDefDetect shared task: detecting levels of psychologica
 ## Shared inputs
 - `contracts/psydefdetect_execution_budget.md`
 - `scoring/run_psydefdetect_local_score.py`
-- the standardized split — its canonical sha256 is published in `docs/rules.md` ("Split Freeze")
+- the standardized split: `psydefdetect_split.canonical.json`（仓库根；sha256 公示见 `docs/rules.md` §3.3）
 
 ## Task Definition
 Given a target help-seeker utterance and the preceding supportive conversation context, predict one of nine labels:

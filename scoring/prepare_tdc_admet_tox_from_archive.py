@@ -9,9 +9,9 @@
 
 本脚本改用**行号**重建：官方归档 `admet_group.zip` 已被 sha256 冻结
 （`bd000524…`），因此 `train_val.csv` / `test.csv` 的行号是稳定唯一的键。
-划分冻结在 `automation/tdc_admet_tox_split.canonical.json` 里。
+划分冻结在 `tdc_admet_tox_split.canonical.json`（仓库根）。
 
-`sample_id` 的生成规则（实测自 canonical 文件，重建结果**逐字节一致**）：
+`sample_id` 的生成规则（自 canonical 文件生成，重建结果**逐字节一致**）：
 
     {endpoint.upper()}_{tv|test}_{归档行号:06d}
 

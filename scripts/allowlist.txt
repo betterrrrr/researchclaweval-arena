@@ -42,6 +42,8 @@ judge/trajectory_metrics.py
 LICENSE
 NOTICE.md
 provider.example.toml
+psydefdetect_split.canonical.json
+psydefdetect_split.canonical.json.sha256
 README.md
 README.zh-CN.md
 results/README.md
@@ -68,6 +70,8 @@ scripts/gitleaks.toml
 scripts/runner/my_framework_wrapper.sh
 scripts/setup_datasets.sh
 SECURITY.md
+tdc_admet_tox_split.canonical.json
+tdc_admet_tox_split.canonical.json.sha256
 templates/admission/native_admission_evidence.v1.json
 templates/admission/native_evaluation_spec.example.json
 templates/admission/native_prompt_audit.v1.json

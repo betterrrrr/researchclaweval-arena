@@ -52,7 +52,16 @@ Read these three:
   ground truth so you can self-evaluate with the official metric. The other
   90 are the scoring set and are never mounted into your container.
 - `contracts/psydefdetect_contract.md` — macro-F1 over positive classes 1–8;
-  the dialogue-level split is frozen (canonical sha256 in `docs/rules.md`).
+  the dialogue-level split is frozen (file `psydefdetect_split.canonical.json`
+  in the repo root; canonical sha256 in `docs/rules.md` §3.3). You can
+  self-score immediately:
+
+  ```bash
+  python3 scoring/run_psydefdetect_local_score.py \
+    --dataset-root "$PSYDEFDETECT_DATASET_ROOT" \
+    --predictions predictions.jsonl \
+    --output-score score.json
+  ```
 - `contracts/tdc_admet_tox_contract.md` — macro average of AMES / hERG / DILI
   AUROC. Read §5.6 of the rules about `sample_id` **before** writing code
   (`hERG` endpoint → `HERG_` id prefix).

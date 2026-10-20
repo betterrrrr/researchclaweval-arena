@@ -50,7 +50,7 @@ Example:
 ```csv
 sample_id,endpoint,probability
 AMES_000001,AMES,0.7312
-hERG_000001,hERG,0.1184
+HERG_000001,hERG,0.1184
 DILI_000001,DILI,0.5570
 ```
 
@@ -59,7 +59,7 @@ DILI_000001,DILI,0.5570
 The scorer is invoked outside the framework container:
 
 ```bash
-python3 automation/scripts/run_tdc_admet_tox_host_score.py \
+python3 scoring/run_tdc_admet_tox_host_score.py \
   --public-dataset-root /path/to/public \
   --hidden-labels /host-private/test_labels.csv \
   --predictions /run/workspace/predictions.csv \

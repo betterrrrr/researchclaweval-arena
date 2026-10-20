@@ -11,8 +11,7 @@ import urllib.request, urllib.error
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROMPT_DIR = os.path.join(BASE_DIR, "prompts")
 
-# e2e.log 超出此长度就取头尾各半。原值 500000（头尾各 250K），
-# 实测 152 个有日志的 run 里 17 个会被截断。
+# e2e.log 超出此长度就取头尾各半。
 LOG_LIMIT_CHARS = 120000
 DEFAULT_MODEL = os.environ.get("JUDGE_MODEL", "")
 DEFAULT_API_BASE = os.environ.get("JUDGE_BASE_URL", "")
@@ -228,10 +227,11 @@ def judge_run(run_dir, model=DEFAULT_MODEL, dims=None):
     print(f"Evaluating: {run_name}")
     print(f"{'='*60}")
     artifacts = load_artifacts(run_dir)
+    # run 目录命名：<framework>-<topic>-<YYYYMMDDTHHMMSS>（rules §5.2）
     parts = run_name.split("-")
-    framework = "06"
-    topic = parts[2] if len(parts) > 2 else "unknown"
-    model_name = "-".join(parts[3:-2]) if len(parts) > 4 else "unknown"
+    framework = parts[0] if parts else "unknown"
+    topic = parts[1] if len(parts) > 1 else "unknown"
+    model_name = "unknown"
     if dims is None:
         dims = DIMENSIONS
     scores = {}

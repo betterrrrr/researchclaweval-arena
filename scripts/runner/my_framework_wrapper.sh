@@ -30,12 +30,13 @@ export FRAMEWORK_ENTRY_PATHS="${FRAMEWORK_ENTRY_PATHS:-$ENTRYPOINT}"
 export FRAMEWORK_PROVIDER_INJECTION="env"  # OPENAI_BASE_URL/OPENAI_API_KEY/OPENAI_MODEL
 export FRAMEWORK_NATIVE_LOG_MARKER="${FRAMEWORK_NATIVE_LOG_MARKER:-MYFRAMEWORK_NATIVE}"
 
-# --- organizer-provided model env (rules §4) ---
-: "${OPENAI_BASE_URL:?must be injected by the organizer (rules §4)}"
-: "${OPENAI_API_KEY:?must be injected by the organizer (rules §4)}"
-: "${OPENAI_MODEL:?must be injected by the organizer (rules §4)}"
+# --- model env (rules §4) — yours during self-testing, the organizer's at
+# official evaluation; the framework code never hardcodes an endpoint/id ---
+: "${OPENAI_BASE_URL:?set your own values for self-testing; the organizer injects at official evaluation (rules §4)}"
+: "${OPENAI_API_KEY:?set your own values for self-testing; the organizer injects at official evaluation (rules §4)}"
+: "${OPENAI_MODEL:?set your own values for self-testing; the organizer injects at official evaluation (rules §4)}"
 
-RUN_ID="${FRAMEWORK_ID}_${FRAMEWORK_NAME}_${TOPIC}_$(date +%Y%m%dT%H%M%S)"
+RUN_ID="${FRAMEWORK_ID}-${FRAMEWORK_NAME}-${TOPIC}-$(date +%Y%m%dT%H%M%S)"
 WS="$RUN_ROOT/$RUN_ID/workspace"
 mkdir -p "$WS/input" "$RUN_ROOT/$RUN_ID/logs"
 

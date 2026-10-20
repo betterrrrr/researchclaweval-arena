@@ -110,8 +110,7 @@ def main() -> int:
     chosen = set(random.Random(args.seed).sample(ordered, args.visible_count))
 
     # ── 2. 整表读出，按 mlp_id 过滤后一次写完 ───────────────────────────
-    # 刻意**不**用 batch_size=1 流式路由：那会写出「每行一个行组」，压缩率崩掉
-    # （实测 90 行输出 1.17GB，比 100 行的源文件还大 39%，行组数 90 vs 源的 1）。
+    # 刻意**不**用 batch_size=1 流式路由：那会产生每行一个行组的输出，压缩率崩溃。
     # weights 是 32×256×256 的嵌套列，整表读需要较大内存 —— host 上跑没问题。
     output_root.mkdir(parents=True, exist_ok=True)
     visible_dir = output_root / "visible-validation" / "data"

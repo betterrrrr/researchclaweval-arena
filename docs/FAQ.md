@@ -10,7 +10,8 @@ secret split. That is deliberate — see `docs/rules.md` §0 and §2.
 **Q: Is the leaderboard a single merged score?**
 No. The main board is three columns, one ranking per task. The three metrics
 (0.5–1.0 AUROC, ~0.1–0.3 macro-F1, arc across orders of magnitude) cannot be
-merged without calibration artifacts dominating the result — see rules §6.3.
+merged without calibration artifacts dominating the result — see the
+"Ranking" section of `docs/rules.md` (§6.3) and `docs/announcement.md` §6.3.
 
 **Q: Who provides the model?**
 Two stages. Self-testing (before submission): you bring your own model —
@@ -55,8 +56,8 @@ zero score (rules §5.6).
 **Q: My ARC estimator was rejected.**
 The official adapter fails closed: `predict(self, mlp)` must return a real
 `(32, 256)` float array. Constants, broadcast, scalar, zero-filled,
-placeholder, or pasted log outputs are inadmissible (§5.3, 6.4 of the ARC
-contract). Also check the signature — some estimators omit the `budget`
+placeholder, or pasted log outputs are inadmissible (ARC contract,
+"Required Outputs"). Also check the signature — some estimators omit the `budget`
 parameter; the adapter probes the signature and supports both.
 
 **Q: Why doesn't my ARC run have `b0`/`bT`?**

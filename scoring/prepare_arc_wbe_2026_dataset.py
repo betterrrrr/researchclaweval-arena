@@ -49,9 +49,6 @@ def default_whest_python() -> str:
     env_value = os.environ.get("ARC_WBE_2026_WHEST_PYTHON")
     if env_value:
         return env_value
-    preferred = Path("/tmp/whest-starterkit/.venv/bin/python")
-    if preferred.exists():
-        return str(preferred)
     return shutil.which("python3") or "python3"
 
 

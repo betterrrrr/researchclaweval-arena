@@ -87,7 +87,10 @@ def accuracy(gold: list[int], pred: list[int]) -> float:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Score PsyDefDetect predictions with the standardized split.")
     parser.add_argument("--dataset-root", required=True)
-    parser.add_argument("--split-manifest", required=True)
+    parser.add_argument("--split-manifest",
+                        default=str(Path(__file__).resolve().parents[1] / "psydefdetect_split.canonical.json"),
+                        help="canonical split file (defaults to the repo-root copy; "
+                             "sha256 published in docs/rules.md §3.3)")
     parser.add_argument("--predictions", required=True)
     parser.add_argument("--output-score", required=True)
     args = parser.parse_args()

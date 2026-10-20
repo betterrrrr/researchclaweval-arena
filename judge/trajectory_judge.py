@@ -270,8 +270,8 @@ def assess_ed(
     }
     # 门槛字段 = `ED_FIELDS`（模块级常量），**判据与 ORDINAL_FIELDS 分开维护**：
     # ED 要的是「这条实验有没有描述**方法**」，所以 `decision`/`verdict`/`status` 一律不收。
-    # 2026-10-15 起 `ED_FIELDS` 多收了 4 个键（见其定义处），修的是 02/04/06/07 的
-    # `configuration`/`plan_excerpt` 式 trace 被判成 insufficient_approaches 的问题。
+    # `ED_FIELDS` 多收的 4 个键（见其定义处）修的是「按 stage 迭代」的 trace
+    # 被判成 insufficient_approaches 的问题。
     with_approach = [e for e in evidence if any(e.get(k) for k in ED_FIELDS)]
     if len(with_approach) < 2:
         record["ed"] = None

@@ -35,7 +35,7 @@ leaderboard/results.json
 *.db
 *.sqlite*
 
-# Curated-out internal automation trees
+# Curated-out implementation trees
 automation/
 real_eval/
 

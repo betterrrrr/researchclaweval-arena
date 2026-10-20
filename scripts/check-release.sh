@@ -52,6 +52,9 @@ is_exempt() {
   for e in "${EXEMPT[@]}"; do
     [[ "$rel" == "$e" ]] && return 0
   done
+  # split manifest files are protocol DATA — their record counts are ordinary
+  # numbers, not internal matrix statistics
+  [[ "$rel" == *_split.canonical.json ]] && return 0
   return 1
 }
 
@@ -104,6 +107,10 @@ P=(
   # banned — they legitimately appear in tool dirs and participant docs.
   '\b(gpt-?5|gpt-?6|kimi|luna)\b'
   '\b(fullpipe|intake_0102|judge_0102|admission_probe|candidate-run)\b'
+  # semantic leakage patterns surfaced by the independent review
+  '\bFramework 0[0-9]\b'
+  '/tmp/whest'
+  'framework[[:space:]]*=[[:space:]]*"[0-9]{2}"'
   # domains / endpoints
   '\bparatera\b|\bbianxie\b|\bmoonshot\b|\bhost\.docker\.internal\b|\bresearchclaweval\.dev\b'
   # internal result/run vocabulary

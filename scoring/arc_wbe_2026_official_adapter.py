@@ -20,20 +20,33 @@ def _normalize_framework_hint(framework_hint: str | None) -> str | None:
         .replace("-", "")
         .replace(" ", "")
     )
-    aliases = {
-        "01": "01",
-        "02": "02",
-        "03": "03",
-        "04": "04",
-        "05": "05",
-        "06": "06",
-        "07": "07",
-    }
-    return aliases.get(normalized)
+    return normalized if re.fullmatch(r"[0-9]{2}", normalized) else None
 
 
 def _read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="ignore")
+
+
+def _detect_estimator_form(text: str) -> tuple[str, str, str] | None:
+    """探测 estimator 代码形态 → (source_symbol, adapter_kind, predict_input)。
+
+    只按代码结构分派，不依赖任何框架 id：参赛者用注册号作 hint（仅记录用）。
+    """
+    predict_input = None
+    if re.search(r"def\s+predict\s*\(\s*self\s*,\s*mlp\b", text):
+        predict_input = "mlp"
+    elif re.search(r"def\s+predict\s*\(\s*self\s*,\s*weights\b", text):
+        predict_input = "weights"
+    if predict_input is None:
+        return None
+    if "def build_estimator" in text:
+        return "build_estimator", BUILD_ESTIMATOR_KIND, predict_input
+    if re.search(r"class\s+Estimator\b", text) is not None:
+        return "Estimator", ESTIMATOR_FACTORY_KIND, "mlp"
+    named = re.search(r"class\s+(\w*[Ee]stimator)\b", text)
+    if named is not None:
+        return named.group(1), WEIGHTS_OR_MLP_KIND, predict_input
+    return None
 
 
 def _scan_file(path: Path, framework_hint: str | None) -> dict[str, object] | None:
@@ -47,84 +60,26 @@ def _scan_file(path: Path, framework_hint: str | None) -> dict[str, object] | No
         raise ValueError(f"placeholder constant prediction is not admissible: {resolved_path}")
     if re.search(r"\b(?:placeholder|synthetic\s+prediction|fallback\s+prediction)\b", text, re.I):
         raise ValueError(f"placeholder prediction language is not admissible: {resolved_path}")
-    if (
-        normalized_hint == "03"
-        and "class Estimator" in text
-        and re.search(
-            r"def\s+predict\s*\(\s*self\s*,\s*mlp\b",
-            text,
-        )
-    ):
-        return {
-            "adapter_kind": ESTIMATOR_FACTORY_KIND,
-            "framework_hint": normalized_hint,
-            "workspace": resolved_path.parent,
-            "source_path": resolved_path,
-            "source_symbol": "Estimator",
-        }
-    if normalized_hint == "05" and re.search(r"class\s+(\w*[Ee]stimator)\b", text):
-        source_symbol = re.search(r"class\s+(\w*[Ee]stimator)\b", text).group(1)
-        predict_input = None
-        if re.search(r"def\s+predict\s*\(\s*self\s*,\s*weights\b", text):
-            predict_input = "weights"
-        elif re.search(r"def\s+predict\s*\(\s*self\s*,\s*mlp\b", text):
-            predict_input = "mlp"
-        if predict_input is None:
-            return None
-        return {
-            "adapter_kind": WEIGHTS_OR_MLP_KIND,
-            "framework_hint": normalized_hint,
-            "workspace": resolved_path.parent,
-            "source_path": resolved_path,
-            "source_symbol": source_symbol,
-            "predict_input": predict_input,
-        }
-    if normalized_hint == "06" and "def build_estimator" in text:
-        predict_input = None
-        if re.search(r"def\s+predict\s*\(\s*self\s*,\s*mlp\b", text):
-            predict_input = "mlp"
-        elif re.search(r"def\s+predict\s*\(\s*self\s*,\s*weights\b", text):
-            predict_input = "weights"
-        if predict_input is None:
-            return None
-        return {
-            "adapter_kind": BUILD_ESTIMATOR_KIND,
-            "framework_hint": normalized_hint,
-            "workspace": resolved_path.parent,
-            "source_path": resolved_path,
-            "source_symbol": "build_estimator",
-            "predict_input": predict_input,
-        }
-    if normalized_hint in {"01", "02", "04", "07"}:
-        has_builder = "def build_estimator" in text
-        has_estimator_class = re.search(r"class\s+Estimator\b", text) is not None
-        predict_input = None
-        if re.search(r"def\s+predict\s*\(\s*self\s*,\s*mlp\b", text):
-            predict_input = "mlp"
-        elif re.search(r"def\s+predict\s*\(\s*self\s*,\s*weights\b", text):
-            predict_input = "weights"
-        if predict_input is not None and (has_builder or has_estimator_class):
-            return {
-                "adapter_kind": GENERIC_NATIVE_ADAPTER_KIND,
-                "framework_hint": normalized_hint,
-                "workspace": resolved_path.parent,
-                "source_path": resolved_path,
-                "source_symbol": "build_estimator" if has_builder else "Estimator",
-                "predict_input": predict_input,
-            }
-    return None
+    form = _detect_estimator_form(text)
+    if form is None:
+        return None
+    source_symbol, adapter_kind, predict_input = form
+    return {
+        "adapter_kind": adapter_kind,
+        "framework_hint": normalized_hint,
+        "workspace": resolved_path.parent,
+        "source_path": resolved_path,
+        "source_symbol": source_symbol,
+        "predict_input": predict_input,
+    }
 
 
 def scan_workspace_for_official_adapter(
     workspace: Path, framework_hint: str | None = None
 ) -> dict[str, object]:
-    normalized_hint = _normalize_framework_hint(framework_hint)
-    if normalized_hint not in {"01", "02", "03", "04", "05", "06", "07"}:
-        raise ValueError(f"no supported official adapter candidate found under {workspace}")
-
     workspace = workspace.resolve()
     source_path = workspace / "estimator.py"
-    result = _scan_file(source_path, normalized_hint)
+    result = _scan_file(source_path, framework_hint)
     if result is not None:
         result["workspace"] = workspace
         return result

@@ -23,9 +23,9 @@ Validation rules (rules §5, §8, contracts/):
 - `logs/e2e.log` is the primary record. The judge reads
   `logs/e2e.log` → `logs/native.log` → `logs/native_stdout.log`; a
   root-level `run.log` is not consulted.
-- The frame-level `score.json` is written only by the host-side official
-  scorer after the framework exits (scoring/scripts). Never create or modify
-  it yourself.
+- The root-level `score.json` is written only by the host-side official
+  scorer after the framework exits (e.g. `scoring/run_tdc_admet_tox_host_score.py`).
+  Never create or modify it yourself.
 - ARC payload: `estimator.py` exposing `predict(self, mlp)` returning a real
   `(32, 256)` array (see `contracts/arc_wbe_2026_contract.md` and
   `scoring/arc_wbe_2026_official_adapter.py` for the fail-closed checks).

@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "automation" / "scripts"))
+sys.path.insert(0, str(ROOT / "scoring"))
 
 from arc_wbe_2026_official_adapter import (  # noqa: E402
     materialize_official_adapter,
@@ -311,7 +311,7 @@ def run_whest(
         return None, None
 
     output_root.mkdir(parents=True, exist_ok=True)
-    prepare_script = ROOT / "automation" / "scripts" / "prepare_arc_wbe_2026_dataset.py"
+    prepare_script = ROOT / "scoring" / "prepare_arc_wbe_2026_dataset.py"
     dataset_arg = ensure_dataset_root(
         dataset_root,
         prepare_script=prepare_script,

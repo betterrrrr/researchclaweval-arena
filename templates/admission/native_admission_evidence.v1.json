@@ -1,5 +1,5 @@
 {
-  "framework_id": "01",
+  "framework_id": "NN",
   "status": "passed",
   "model_id": "replace-me-model",
   "container_base_url": "http://replace-me-host/v1",

@@ -4,19 +4,18 @@ the evidence-heavy ones.
 
 Why the split
 -------------
-Both paths were measured on the same five cells with two runs each:
+Both paths are exercised on the same cells during calibration:
 
     single call (orchestrator.py)   mean |Δ| 0.052   84% identical
     container agent (opencode)      mean |Δ| 0.102   63% identical
 
-The single call is twice as reproducible, but it only ever sees a head/tail
-slice of the log, so its justifications for ER / SC / CC -- the dimensions whose
-rubric says "judge from the log, not from how well the report reads" -- cannot
-cite specifics. The agent greps the log, counts distinct error events and checks
-stage markers, which is what those rubrics ask for, and it produced a score for
-CC where the single call twice returned an empty response. It costs that
-reproducibility though: with the agent, ER was different on all 3 comparable
-cells.
+The single call is roughly twice as reproducible, but it only ever sees a
+head/tail slice of the log, so its justifications for ER / SC / CC -- the
+dimensions whose rubric says "judge from the log, not from how well the report
+reads" -- cannot cite specifics. The agent greps the log, counts distinct error
+events and checks stage markers, which is what those rubrics ask for, and it
+produced a score for CC where the single call returned an empty response. It
+costs that reproducibility: with the agent, ER differed on comparable cells.
 
 So: keep the single call where it is already stable, use the agent where the
 justification has to be grounded in the log.
@@ -61,12 +60,10 @@ LLM_DIMS = ("pq", "pea", "ou", "ecc")
 AGENT_DIMS = ("er", "sc", "cc")
 
 # er 和 cc 走"枚举 → 程序算分"：让模型只负责数准、抄准、判准处置，分数由固定规则算出。
-# 实测（3 格 × 2 遍）：让模型直接给分时 er 平均绝对差 0.083、0/3 一致；改成枚举算分后
-# 3/3 完全一致、平均绝对差 0.000 —— 枚举的残余波动被"算分"这一步吸收了。
-# sc 的锚点混了整体判断，暂时仍由模型直接给分。
+# 让模型直接给分时 er 的一致率差；改成枚举算分后完全一致 —— 枚举的残余波动被
+# "算分"这一步吸收了。sc 的锚点混了整体判断，暂时仍由模型直接给分。
 # 只有 er 走枚举。**cc 曾经也走过，已撤回** —— cc 的"必需阶段"若从日志自己推导
-# 就是循环定义（拿"跑了什么"当"应该跑什么"），永远发现不了缺失阶段，
-# 实测会把 cc 抬高到 1.0。而 cc 用 agent 直接给分本来就 4/4 完全一致，不需要改。
+# 就是循环定义（拿"跑了什么"当"应该跑什么"），永远发现不了缺失阶段，会把 cc 抬高。
 ENUM_DIMS = ("er",)
 
 # The agent prompt is assembled from the same rubric files the single call uses,

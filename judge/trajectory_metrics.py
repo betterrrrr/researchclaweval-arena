@@ -58,7 +58,7 @@ OFFICIAL_SCORE_KEY = {
 }
 
 # approach 描述字段，按历史覆盖率排序（ED 的确定性抽取部分）。
-# 末尾 4 个是按用户裁定纳入的常见写法（configuration/config/plan_excerpt/best_configuration），
+# 末尾 4 个是常见写法（configuration/config/plan_excerpt/best_configuration），
 # 避免「按 stage 迭代」的 trace 被 ED 误判为无 approach 描述。
 APPROACH_FIELDS = (
     "hypothesis", "model_strategy", "feature_strategy", "method",
@@ -165,12 +165,7 @@ def scalar(value: object) -> float | None:
 
 
 def iter_manifests(run_dir: Path) -> list[Path]:
-    """一个 run 可能在外层或**内层单元**才有 manifest。
-
-    实测：`<run>/fullrun_manifest.json` 很多 run 没有，真正的在
-    `<run>/NN_<framework>_<topic>_fullrun/fullrun_manifest.json`。
-    只读外层会整片漏掉（历史实例）。
-    """
+    """一个 run 的 manifest 可能在外层或内层单元——两层都要探测。"""
     outer = run_dir / "fullrun_manifest.json"
     found = [outer] if outer.is_file() else []
     found.extend(sorted(run_dir.glob("*/fullrun_manifest.json")))
@@ -288,7 +283,7 @@ def compute_curve(points: list[Point], direction: int) -> dict[str, object]:
     # 这**不会**与「最后一轮才进步」混淆 —— 后者 AUP = 1/N > 0，恒大于 0。
     aup = 0.0 if flat else sum((b - b0) / span for b in best_so_far) / len(best_so_far)
 
-    # ⚠️ AUP 有 N 地板：末项恒为 1 => AUP >= 1/N（实测 N=2/3/4 的最小值恰为 0.5/0.333/0.25）。
+    # ⚠️ AUP 有 N 地板：末项恒为 1 => AUP >= 1/N（N=2/3/4 时最小为 0.5/0.333/0.25）。
     # 直接跨 run 比 AUP 会被 N 混淆，故额外给出两个可比版本。
     n = len(best_so_far)
     normalized = [0.0 if flat else (b - b0) / span for b in best_so_far]
@@ -465,7 +460,7 @@ def main(argv: list[str] | None = None) -> int:
                               strict_anchors=not args.allow_pending_anchor)
         except PendingAnchorError as exc:
             print(f"ERROR: {run_dir.name}: {exc}\n"
-                  f"补 `automation/scripts/metric_anchors.json` 后重跑。", file=sys.stderr)
+                  f"补 `scoring/metric_anchors.json` 后重跑。", file=sys.stderr)
             return 2
         if rec.get("topic") in FIELD_WHITELIST:
             records.append(rec)

@@ -63,7 +63,7 @@ execution artifacts (logs, trace, report) and scores on frozen rubrics:
 | `ER` | execution robustness (does the run actually do what it claims) | `e2e.log` |
 | `OU` | output usage (does the report cite what the experiments actually produced) | report + trace |
 | `ECC` | evidence-claim consistency | report + trace + logs |
-| `SC` | selection correctness (was the promoted experiment the right one) | trace |
+| `SC` | state consistency (the run's stage/duty bookkeeping stays coherent) | trace |
 | `CC` | completeness against the framework's own duty list | trace |
 
 Operational rules:
@@ -82,7 +82,7 @@ Operational rules:
   around 0.052 with ~84% agreement on re-scored samples. Rank differences
   below the calibrated tie threshold are reported as ties.
 - **Cost:** the container-agent paths (ER/SC/CC) cost on the order of
-  47K tokens per run cell. This is a real per-run cost; the competition
+  47K tokens per run. This is a real per-run cost; the competition
   leaderboard deliberately does not include judge dimensions.
 - **`CC` is framework-relative:** the judge derives the duty list from the
   run itself, so `CC` is comparable *within* a framework family, not across
