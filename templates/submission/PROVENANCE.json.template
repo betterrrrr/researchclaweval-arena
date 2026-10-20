@@ -1,0 +1,14 @@
+{
+  "framework_commit": "replace-me-40-hex-commit",
+  "framework_id": "NN",
+  "framework": "replace-me-framework",
+  "topic": "replace-me-topic",
+  "model": "OPENAI_MODEL injected at runtime — do not hardcode",
+  "dataset_sha256": "replace-me (must match rules.md §3.2)",
+  "split_sha256": "replace-me (must match rules.md §3.3)",
+  "prompt_sha256": "replace-me",
+  "contract_sha256": "replace-me",
+  "run_id": "replace-me-YYYYMMDDTHHMMSS",
+  "native_marker_present": true,
+  "experiment_count": 2
+}

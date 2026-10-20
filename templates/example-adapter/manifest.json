@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "framework_id": "NN",
+  "name": "replace-me-framework",
+  "upstream_url": "https://github.com/replace-me/framework.git",
+  "upstream_commit": "replace-me-40-hex-commit",
+  "license_spdx": "replace-me-spdx",
+  "native_entrypoint": "replace-me: python run_agent.py --topic <topic>",
+  "native_entrypoint_source": "replace-me/path/to/entrypoint.py",
+  "admission_status": "candidate_requires_runtime_evidence",
+  "supported_topics": [
+    "tdc_admet_tox",
+    "psydefdetect",
+    "arc_wbe_2026"
+  ],
+  "required_env": [
+    "OPENAI_BASE_URL",
+    "OPENAI_API_KEY",
+    "OPENAI_MODEL"
+  ],
+  "required_images": [
+    "replace-me-framework:runtime-ready"
+  ],
+  "patches": []
+}

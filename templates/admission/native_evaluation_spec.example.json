@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "campaign_id": "replace-me-campaign",
+  "topic": "replace-me-topic",
+  "framework": {
+    "framework_id": "NN",
+    "framework_slug": "myframework",
+    "runtime_image": "replace-me-framework:runtime-ready",
+    "native_entrypoint": "replace-me: python run_agent.py --topic <topic>",
+    "native_log_marker": "MYFRAMEWORK_NATIVE",
+    "env_injection": [
+      "OPENAI_BASE_URL",
+      "OPENAI_API_KEY",
+      "OPENAI_MODEL"
+    ],
+    "dataset_mount": "read-only"
+  },
+  "split_sha256": "replace-me (must match docs/rules.md §3.3)",
+  "experiment_budget": {
+    "min": 2,
+    "max": 4
+  }
+}
