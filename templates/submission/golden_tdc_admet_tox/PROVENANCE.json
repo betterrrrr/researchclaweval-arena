@@ -1,0 +1,14 @@
+{
+  "framework_commit": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
+  "framework_id": "01",
+  "framework": "example-golden-framework",
+  "topic": "tdc_admet_tox",
+  "model": "example-golden-model",
+  "dataset_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+  "split_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "prompt_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+  "contract_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+  "run_id": "01-example-golden-framework-tdc_admet_tox-20261020T000000",
+  "native_marker_present": true,
+  "experiment_count": 2
+}

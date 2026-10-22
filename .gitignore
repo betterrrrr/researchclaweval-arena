@@ -45,6 +45,7 @@ external/
 recovery/
 .framework-refresh/
 .sdd/
+.superpowers/
 .claude/
 .codex/
 .cursor/

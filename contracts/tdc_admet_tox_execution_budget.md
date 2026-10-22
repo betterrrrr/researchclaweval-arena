@@ -13,11 +13,15 @@ A complete configuration is one distinct model, training, or feature strategy ev
 - a complete training/evaluation log
 - runtime, seed, feature strategy, and model strategy metadata
 
-Failed setup attempts that do not train or evaluate a configuration are logged but do not count as experiments. Re-running the same configuration with no material change is not a new experiment.
+Failed setup attempts that do not train or evaluate a configuration are logged but do not count as experiments. Re-running the same configuration with no material change is not a new experiment. A configuration that was trained and evaluated and then crashed or timed out counts for its line; the crash or timeout itself does not open a new line.
+
+## Experiment Counting
+
+Experiments are counted as strategy lines (docs/rules.md §5.8): a strategy line is a cluster of materially different configurations (differing in at least one of algorithm family, feature representation, architecture, or overall hyperparameter-search design). Retries, seed-only repeats, and small tuning inside one line are not new experiments. A line is established only once at least one of its configurations is complete (all bullets above).
 
 ## Hard Limits
 
-- Complete 2 to 4 configurations. Never begin a fifth.
+- Complete 2 to 4 configurations across at least two distinct strategy lines (see Experiment Counting). Never begin a fifth configuration or a fifth strategy line.
 - Each configuration may evaluate exactly one candidate (`candidate_count: 1`). Every hidden sweep candidate counts as a separate configuration.
 - At least two configurations must differ in config content and declared model or feature strategy.
 - Use experiments 1 and 2 to establish and test the initial hypotheses.

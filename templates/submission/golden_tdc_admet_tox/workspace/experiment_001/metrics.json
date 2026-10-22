@@ -1,0 +1,10 @@
+{
+  "split": "validation",
+  "macro_average_auroc": 0.752,
+  "macro_average_auprc": 0.66,
+  "per_endpoint": {
+    "AMES": {"auroc": 0.81, "auprc_average_precision": 0.71, "brier_score": 0.19, "ece_10_bin": 0.05},
+    "hERG": {"auroc": 0.74, "auprc_average_precision": 0.66, "brier_score": 0.21, "ece_10_bin": 0.06},
+    "DILI": {"auroc": 0.706, "auprc_average_precision": 0.62, "brier_score": 0.24, "ece_10_bin": 0.07}
+  }
+}

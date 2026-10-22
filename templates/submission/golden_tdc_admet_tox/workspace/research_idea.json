@@ -1,0 +1,7 @@
+{
+  "idea_id": "golden-001",
+  "locked_before_experiments": true,
+  "hypothesis": "Compact fingerprint representations under a regularized linear head give a reproducible baseline; wider fingerprints with balanced class weighting improve minority-sensitive ranking.",
+  "method_rationale": "Compare two materially different configurations, select by validation macro AUROC, and promote the winner.",
+  "comparison_logic": "validation_macro_average_auroc"
+}

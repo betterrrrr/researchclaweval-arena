@@ -4,7 +4,7 @@ This budget applies to every PsyDefDetect framework evaluation.
 
 ## Hard Limits
 
-- Run exactly 2 to 4 materially different experiments. Never start a fifth experiment.
+- Run exactly 2 to 4 materially different experiments, counted as strategy lines (docs/rules.md §5.8): retries and seed-only repeats inside one line are not new experiments, and a line is established only by a complete experiment. Never start a fifth experiment or a fifth strategy line.
 - Each experiment must write a compact result record containing its id, method, official score, and artifact paths.
 - After experiment 2, only run another experiment when it tests a specific improvement over the current best result. There may be at most two such follow-ups.
 - Do not paste complete experiment source code or full prediction files into the agent context. Keep a short results ledger instead.

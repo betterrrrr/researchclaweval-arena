@@ -1,0 +1,3 @@
+[exp_001] morgan_radius_2_1024_bits / logistic_regression_unweighted
+[exp_001] fitted on the fixed train split; evaluated on validation
+[exp_001] validation macro auroc 0.7520 (AMES 0.8100, hERG 0.7400, DILI 0.7060)

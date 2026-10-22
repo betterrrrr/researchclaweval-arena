@@ -1,0 +1,17 @@
+{
+  "python_version": "3.11.6",
+  "platform": "linux-x86_64",
+  "device": "cpu",
+  "seeds": [42, 43],
+  "packages": {
+    "numpy": "1.26.4",
+    "scikit-learn": "1.5.0",
+    "rdkit": "2024.3.5"
+  },
+  "created_at": "2026-10-20T00:00:00+00:00",
+  "reproduction": {
+    "entrypoint": "reproduce.sh",
+    "command": "bash reproduce.sh",
+    "seed": 42
+  }
+}

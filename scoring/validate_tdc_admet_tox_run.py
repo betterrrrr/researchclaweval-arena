@@ -11,15 +11,6 @@ from pathlib import Path
 
 TASK_ID = "tdc_admet_tox"
 ENDPOINTS = ("AMES", "hERG", "DILI")
-EXPECTED_RESOURCE_BUDGET = {
-    "cpu_cores": 4,
-    "memory_gib": 16,
-    "gpu_count": 0,
-    "workspace_disk_gib": 10,
-    "max_experiment_runtime_seconds": 3600,
-    "max_total_wall_seconds": 7200,
-    "network_policy": "injected_llm_relay_only",
-}
 PREDICTION_FIELDS = ["sample_id", "endpoint", "probability"]
 PUBLIC_TEST_FIELDS = ["sample_id", "endpoint", "smiles"]
 CLAIM_MARKER = re.compile(r"<!--\s*claim:([A-Za-z0-9_.:-]+)\s*-->")
@@ -38,6 +29,25 @@ class AuditError(ValueError):
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise AuditError(message)
+
+
+def load_resource_budget() -> dict:
+    """The exact resource_budget dict the trace must record, byte-for-byte.
+
+    Single source of truth is scoring/resource_budget.anchors.json — the
+    same file the reference baseline reads, so participants never need to
+    copy values out of this source (contracts/tdc_admet_tox_compute_budget.md).
+    """
+    anchors_path = Path(__file__).resolve().parent / "resource_budget.anchors.json"
+    require(anchors_path.is_file(), f"resource budget anchors file is missing: {anchors_path}")
+    anchors = read_json(anchors_path)
+    budget = anchors.get("topics", {}).get(TASK_ID)
+    require(
+        isinstance(budget, dict) and budget,
+        f"resource budget anchors for {TASK_ID} are missing or empty: {anchors_path}",
+    )
+    require(budget.get("network_policy"), f"resource budget anchors lack a network_policy")
+    return budget
 
 
 def read_json(path: Path) -> dict:
@@ -508,17 +518,19 @@ def validate_final_score(root: Path, predictions: Path) -> dict:
     return score
 
 
-def audit(root: Path, stage: str, public_dataset_root: Path | None = None) -> dict:
-    root = root.resolve()
-    require(root.is_dir(), f"run workspace does not exist: {root}")
-    reject_hidden_label_artifacts(root)
+def audit(run_root: Path, stage: str, public_dataset_root: Path | None = None) -> dict:
+    run_root = run_root.resolve()
+    require(run_root.is_dir(), f"run directory does not exist: {run_root}")
+    ws = run_root / "workspace"
+    require(ws.is_dir(), f"run workspace does not exist: {ws}")
+    reject_hidden_label_artifacts(ws)
 
-    predictions = root / "predictions.csv"
+    predictions = ws / "predictions.csv"
     require(predictions.is_file(), "root-level predictions.csv is required")
     prediction_count = validate_predictions(predictions)
     if public_dataset_root is not None:
         validate_prediction_keys(predictions, public_dataset_root.resolve())
-    trace = read_json(root / "experiment_trace.json")
+    trace = read_json(ws / "experiment_trace.json")
     require(trace.get("task_id") == TASK_ID, "experiment_trace.json has the wrong task_id")
     require(
         trace.get("framework_native_execution") is True,
@@ -542,7 +554,7 @@ def audit(root: Path, stage: str, public_dataset_root: Path | None = None) -> di
         "final_prediction_file must be predictions.csv",
     )
     require(
-        trace.get("resource_budget") == EXPECTED_RESOURCE_BUDGET,
+        trace.get("resource_budget") == load_resource_budget(),
         "resource_budget does not match contract",
     )
     require(is_number(trace.get("total_wall_seconds")), "total_wall_seconds must be numeric")
@@ -551,7 +563,7 @@ def audit(root: Path, stage: str, public_dataset_root: Path | None = None) -> di
         "total framework wall time exceeds 7200 seconds",
     )
 
-    experiments, paths_by_id = validate_experiments(root, trace)
+    experiments, paths_by_id = validate_experiments(ws, trace)
     selected_id = trace.get("selected_experiment_id")
     require(
         selected_id in experiments, "selected_experiment_id does not name a complete experiment"
@@ -565,49 +577,52 @@ def audit(root: Path, stage: str, public_dataset_root: Path | None = None) -> di
         "selected experiment is not best by validation macro AUROC",
     )
 
-    environment = validate_environment(root, trace)
-    entrypoint = validate_reproduction(root, trace)
-    claims = validate_claims(root, trace, experiments, paths_by_id)
-    paper, checked_table_numbers = validate_paper(root, claims)
+    environment = validate_environment(ws, trace)
+    entrypoint = validate_reproduction(ws, trace)
+    claims = validate_claims(ws, trace, experiments, paths_by_id)
+    paper, checked_table_numbers = validate_paper(ws, claims)
 
-    authored_paths = {root / "experiment_trace.json", environment, paper}
+    authored_paths = {ws / "experiment_trace.json", environment, paper}
     for experiment_paths in paths_by_id.values():
         authored_paths.update(experiment_paths.values())
     reject_cross_topic_or_private_markers(authored_paths)
 
-    logs_dir = root / "logs"
+    logs_dir = run_root / "logs"
     require(
         logs_dir.is_dir() and any(path.is_file() for path in logs_dir.rglob("*")),
         "logs directory is empty",
     )
 
-    score_path = root / "score.json"
+    score_path = ws / "score.json"
     if stage == "framework":
         require(not score_path.exists(), "framework stage must not contain score.json")
         score = None
     else:
-        score = validate_final_score(root, predictions)
+        score = validate_final_score(ws, predictions)
 
     return {
         "task_id": TASK_ID,
         "stage": stage,
         "status": "passed",
-        "workspace": str(root),
+        "run_root": str(run_root),
+        "workspace": str(ws),
         "experiment_count": len(experiments),
         "selected_experiment_id": selected_id,
         "prediction_count": prediction_count,
         "claim_count": len(claims),
         "checked_paper_table_numbers": checked_table_numbers,
-        "paper": str(paper.relative_to(root)),
-        "environment": str(environment.relative_to(root)),
-        "entrypoint": str(entrypoint.relative_to(root)),
+        "paper": str(paper.relative_to(ws)),
+        "environment": str(environment.relative_to(ws)),
+        "entrypoint": str(entrypoint.relative_to(ws)),
         "main_score": score.get("main_score") if score else None,
     }
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Audit a TDC-ADMET-Tox framework handoff.")
-    parser.add_argument("--workspace", type=Path, required=True)
+    parser = argparse.ArgumentParser(
+        description="Audit a TDC-ADMET-Tox framework handoff (run root contains workspace/ + logs/)."
+    )
+    parser.add_argument("--run-root", type=Path, required=True)
     parser.add_argument("--stage", choices=("framework", "final"), required=True)
     parser.add_argument("--public-dataset-root", type=Path)
     return parser.parse_args(argv)
@@ -616,7 +631,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
-        payload = audit(args.workspace, args.stage, args.public_dataset_root)
+        payload = audit(args.run_root, args.stage, args.public_dataset_root)
     except AuditError as exc:
         print(
             json.dumps(

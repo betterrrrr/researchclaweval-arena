@@ -1,0 +1,9 @@
+{
+  "run_id": "exp_001",
+  "feature_strategy": "morgan_radius_2_1024_bits",
+  "model_strategy": "logistic_regression_unweighted",
+  "radius": 2,
+  "n_bits": 1024,
+  "c": 1.0,
+  "class_weight": null
+}

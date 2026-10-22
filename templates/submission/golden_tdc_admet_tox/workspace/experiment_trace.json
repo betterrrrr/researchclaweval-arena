@@ -1,0 +1,105 @@
+{
+  "task_id": "tdc_admet_tox",
+  "framework_native_execution": true,
+  "consumed_topic_input": true,
+  "framework_internal_model": "example-golden-model",
+  "framework_internal_api_base_url": "https://example.injected.relay/v1",
+  "selection_metric": "validation_macro_average_auroc",
+  "final_prediction_file": "predictions.csv",
+  "resource_budget": {
+    "cpu_cores": 4,
+    "memory_gib": 16,
+    "gpu_count": 0,
+    "workspace_disk_gib": 10,
+    "max_experiment_runtime_seconds": 3600,
+    "max_total_wall_seconds": 7200,
+    "network_policy": "injected_llm_relay_only"
+  },
+  "total_wall_seconds": 7200.0,
+  "environment_file": "environment.json",
+  "reproduction": {
+    "entrypoint": "reproduce.sh",
+    "command": "bash reproduce.sh",
+    "seed": 42
+  },
+  "idea_locked_before_experiments": true,
+  "experiments": [
+    {
+      "run_id": "exp_001",
+      "status": "complete",
+      "hypothesis": "A compact fingerprint representation with a regularized linear head provides a reproducible baseline for molecular toxicity prediction.",
+      "model_strategy": "logistic_regression_unweighted",
+      "feature_strategy": "morgan_radius_2_1024_bits",
+      "runtime_seconds": 240.0,
+      "seed": 42,
+      "candidate_count": 1,
+      "config_file": "experiment_001/config.json",
+      "prediction_file": "experiment_001/predictions.csv",
+      "metrics_file": "experiment_001/metrics.json",
+      "log_file": "experiment_001/train.log",
+      "validation_metrics": {
+        "macro_average_auroc": 0.752,
+        "per_endpoint": {
+          "AMES": {"auroc": 0.81, "auprc_average_precision": 0.71, "brier_score": 0.19, "ece_10_bin": 0.05},
+          "hERG": {"auroc": 0.74, "auprc_average_precision": 0.66, "brier_score": 0.21, "ece_10_bin": 0.06},
+          "DILI": {"auroc": 0.706, "auprc_average_precision": 0.62, "brier_score": 0.24, "ece_10_bin": 0.07}
+        }
+      }
+    },
+    {
+      "run_id": "exp_002",
+      "status": "complete",
+      "hypothesis": "A wider fingerprint with balanced class weighting improves ranking on minority-sensitive endpoints.",
+      "model_strategy": "logistic_regression_balanced",
+      "feature_strategy": "morgan_radius_2_2048_bits",
+      "runtime_seconds": 360.0,
+      "seed": 43,
+      "candidate_count": 1,
+      "config_file": "experiment_002/config.json",
+      "prediction_file": "experiment_002/predictions.csv",
+      "metrics_file": "experiment_002/metrics.json",
+      "log_file": "experiment_002/train.log",
+      "validation_metrics": {
+        "macro_average_auroc": 0.768,
+        "per_endpoint": {
+          "AMES": {"auroc": 0.82, "auprc_average_precision": 0.73, "brier_score": 0.18, "ece_10_bin": 0.04},
+          "hERG": {"auroc": 0.752, "auprc_average_precision": 0.68, "brier_score": 0.2, "ece_10_bin": 0.05},
+          "DILI": {"auroc": 0.732, "auprc_average_precision": 0.65, "brier_score": 0.23, "ece_10_bin": 0.06}
+        }
+      }
+    }
+  ],
+  "selected_experiment_id": "exp_002",
+  "claims": [
+    {
+      "claim_id": "table1_macro_run1",
+      "source_run_id": "exp_001",
+      "endpoint": "macro",
+      "metric": "auroc",
+      "value": 0.752,
+      "prediction_file": "experiment_001/predictions.csv",
+      "config_file": "experiment_001/config.json",
+      "log_file": "experiment_001/train.log"
+    },
+    {
+      "claim_id": "table1_macro_run2",
+      "source_run_id": "exp_002",
+      "endpoint": "macro",
+      "metric": "auroc",
+      "value": 0.768,
+      "prediction_file": "experiment_002/predictions.csv",
+      "config_file": "experiment_002/config.json",
+      "log_file": "experiment_002/train.log"
+    },
+    {
+      "claim_id": "table1_ames_run1",
+      "source_run_id": "exp_001",
+      "endpoint": "AMES",
+      "metric": "auroc",
+      "value": 0.81,
+      "prediction_file": "experiment_001/predictions.csv",
+      "config_file": "experiment_001/config.json",
+      "log_file": "experiment_001/train.log"
+    }
+  ]
+}

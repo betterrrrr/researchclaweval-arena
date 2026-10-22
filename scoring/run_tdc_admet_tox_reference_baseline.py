@@ -14,15 +14,20 @@ from pathlib import Path
 TASK_ID = "tdc_admet_tox"
 ENDPOINTS = ("AMES", "hERG", "DILI")
 SEED = 42
-RESOURCE_BUDGET = {
-    "cpu_cores": 4,
-    "memory_gib": 16,
-    "gpu_count": 0,
-    "workspace_disk_gib": 10,
-    "max_experiment_runtime_seconds": 3600,
-    "max_total_wall_seconds": 7200,
-    "network_policy": "injected_llm_relay_only",
-}
+
+
+def _load_resource_budget() -> dict:
+    # same anchor file the validators load, so the baseline always declares
+    # exactly what the audit expects (contracts/tdc_admet_tox_compute_budget.md)
+    anchors_path = Path(__file__).resolve().parent / "resource_budget.anchors.json"
+    anchors = json.loads(anchors_path.read_text(encoding="utf-8"))
+    budget = anchors["topics"]["tdc_admet_tox"]
+    if not isinstance(budget, dict) or not budget:
+        raise ValueError("resource budget anchors are missing or empty")
+    return budget
+
+
+RESOURCE_BUDGET = _load_resource_budget()
 CONFIGURATIONS = (
     {
         "run_id": "run_001",

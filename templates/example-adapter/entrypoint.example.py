@@ -15,7 +15,10 @@ def main() -> None:
     )
     print(marker, flush=True)
 
-    contract = Path("/workspace/input/contract.md")
+    # Locate the workspace through the injected env var — never hardcode the
+    # path (the fixed container path appears only in the contract text).
+    workspace = Path(os.environ.get("WORKSPACE", "/workspace"))
+    contract = workspace / "input" / "contract.md"
     if contract.exists():
         print(f"[myframework] loaded contract: {contract.name}")
 

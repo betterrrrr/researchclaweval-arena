@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "updated": "2026-10-22",
+  "note": [
+    "The resource_budget dict a framework must record in experiment_trace.json.",
+    "Validators and the reference baseline load their expectations from here;",
+    "participants copying values for self-testing can rely on this file as the",
+    "documented source (contracts/tdc_admet_tox_compute_budget.md)."
+  ],
+  "topics": {
+    "tdc_admet_tox": {
+      "cpu_cores": 4,
+      "memory_gib": 16,
+      "gpu_count": 0,
+      "workspace_disk_gib": 10,
+      "max_experiment_runtime_seconds": 3600,
+      "max_total_wall_seconds": 7200,
+      "network_policy": "injected_llm_relay_only"
+    }
+  }
+}

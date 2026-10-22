@@ -34,7 +34,7 @@ Record each experiment's self-evaluation result under `framework_visible_validat
 - An official-format submission artifact when the selected workflow can produce one.
 - Root-level `research_idea.json`, `estimator.py`, `submission.json`, `experiment_trace.json`, and `final_report.md`, all produced by the framework workflow in the current workspace.
 - The framework must write and lock `research_idea.json` before its first experiment. It must include the hypothesis, method rationale, expected failure modes, and comparison logic.
-- `experiment_trace.json` must prove 2 to 4 materially different experiments, identify the selected experiment, record framework-native execution and the injected internal API model/base URL, and set `idea_artifact: "research_idea.json"` and `idea_locked_before_experiments: true`.
+- `experiment_trace.json` must prove 2 to 4 materially different experiments (counted as strategy lines, docs/rules.md §5.8), identify the selected experiment, record framework-native execution and the injected internal API model/base URL, and set `idea_artifact: "research_idea.json"` and `idea_locked_before_experiments: true`.
 - The host runs the local official scorer after the native framework exits. Only the host may create root-level `score.json`; an official-comparable completion requires `score_source: "official_adapter_whest_run"`.
 - The estimator must produce real per-layer predictions that depend on `mlp.weights`; scalar, broadcast, zero-filled, synthetic, placeholder, copied, or fallback predictions are inadmissible.
 - `predict(mlp)` must return a real prediction matrix of shape `(mlp.depth, mlp.width)` = `(32, 256)`: the predicted mean activation of each of the 256 hidden neurons in each of the 32 layers. A final-layer-only `(256,)` vector, a scalar, or any other shape is invalid and will be rejected by the official adapter.
@@ -56,5 +56,5 @@ Record each experiment's self-evaluation result under `framework_visible_validat
 
 ## Isolation
 
-- Every evaluation uses a fresh physical workspace under `<RUN_ROOT>/<run_id>/<framework>/workspace`.
+- Every evaluation uses a fresh physical workspace under `<RUN_ROOT>/<run_id>/<framework>/workspace`. The runner injects this path to the framework as the `WORKSPACE` env var — never hardcode it.
 - Fixed framework repositories are templates only and must not receive generated artifacts.

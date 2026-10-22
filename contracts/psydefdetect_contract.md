@@ -40,7 +40,7 @@ The primary score is macro-F1 over positive classes `1-8`. Class `0` is excluded
 
 ## Experiment Contract
 - Use the standardized split whose canonical sha256 is published in `docs/rules.md` ("Split Freeze").
-- Run exactly 2 to 4 materially different experiments before selecting a final approach. Never start a fifth experiment.
+- Run exactly 2 to 4 materially different experiments (counted as strategy lines, docs/rules.md §5.8) before selecting a final approach. Never start a fifth.
 - Follow `contracts/psydefdetect_execution_budget.md`: record compact experiment results, only use experiments 3-4 for a specific improvement over the current best result, and finalize immediately after the last experiment.
 - Record those experiments in `experiment_trace.json`.
 - Use the framework's own orchestration flow as much as possible for planning, experiment execution, comparison, and finalization.

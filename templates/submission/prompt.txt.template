@@ -1,0 +1,21 @@
+# Task input: tdc_admet_tox (organizer-provided, rules §5.7)
+
+## Task summary
+
+Predict three molecular toxicity endpoints (AMES / hERG / DILI) from the
+given molecular structure, following the contract and execution budget.
+
+## Contract (read-only, authoritative)
+
+<the runner embeds the full contract here>
+
+## Execution Budget (read-only)
+
+<the runner embeds the full execution budget here>
+
+---
+
+This is the shape of the `prompt.txt` the runner composes at
+`input/prompt.txt` ($WORKSPACE/input/prompt.txt). Submit the exact mounted
+copy verbatim; `PROVENANCE.json` `prompt_sha256` is its sha256
+(docs/rules.md §5.7).

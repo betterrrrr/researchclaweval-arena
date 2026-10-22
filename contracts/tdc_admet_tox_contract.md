@@ -76,7 +76,7 @@ The framework must not create, estimate, backfill, or modify `score.json`. A val
 - Every experiment must have a hypothesis, immutable config, validation predictions, validation metrics, and a log.
 - At least two complete configurations must have distinct config content and distinct declared strategies.
 - Experiments 3 and 4 are permitted only as specific follow-ups to evidence from the current best validation run.
-- Never begin a fifth configuration. Stop exploration immediately after the final permitted experiment and select using validation evidence only.
+- Never begin a fifth configuration or a fifth strategy line (experiments count as strategy lines; docs/rules.md §5.8). Stop exploration immediately after the final permitted experiment and select using validation evidence only.
 - Use at most 4 vCPU, 16 GiB memory, 10 GiB writable disk, 3,600 seconds cumulative experiment runtime, and 7,200 seconds total framework wall time. GPU use is prohibited.
 
 ## Claim Traceability
@@ -112,5 +112,5 @@ Markdown references use `<!-- claim:table1_ames_auroc_model_b -->` in the same t
 
 - Do not route this topic to any other topic's datasets, wrappers, scorers, contracts, or workspaces.
 - Fixed framework workspaces are template sources only.
-- Every evaluation uses a fresh physical workspace under `<RUN_ROOT>/<run_id>/<framework_slug>/workspace`.
+- Every evaluation uses a fresh physical workspace under `<RUN_ROOT>/<run_id>/<framework_slug>/workspace`. The runner injects this path to the framework as the `WORKSPACE` env var — never hardcode it.
 - Framework outputs may be written only under the current `RUN_ROOT`.

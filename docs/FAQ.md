@@ -72,6 +72,15 @@ be printed by *your framework's own execution* into the run log, early in the
 run (rules §5.5). A wrapper printing it on the framework's behalf is judged
 non-native.
 
+**Q: What counts as the 2–4 experiments?**
+Experiments are counted as *strategy lines*: a materially different
+configuration cluster (differing in algorithm family / features /
+architecture / overall hyperparameter-search design). Retries, seed-only
+repeats, and small tuning inside one line do not count; failed setup
+attempts never count; a configuration that was evaluated and then crashed or
+timed out still counts for its line (rules §5.8, contracts' execution
+budgets).
+
 **Q: Can I submit a self-computed score?**
 No. Self-reported scores never enter the board — placeholder values,
 self-implemented metrics, and wrong splits are all rejection grounds
@@ -88,7 +97,9 @@ and verify them yourself.
 
 **Q: What is the runner?**
 A template wrapper (`scripts/runner/`) that mounts contract + dataset
-read-only, injects the model env, runs your framework natively in a fresh
+read-only, injects the model env, exports `WORKSPACE` / `DATASET_ROOT`,
+composes the task input at `input/prompt.txt` (contract + execution budget +
+task summary; rules §5.7), runs your framework natively in a fresh
 workspace, and collects `logs/e2e.log` and the artifacts. You must use it
 rather than your own ad-hoc orchestration so the artifacts are attributable
 (rules §5.4).

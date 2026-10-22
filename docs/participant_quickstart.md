@@ -69,8 +69,10 @@ Read these three:
 All contracts share the same spine:
 
 - write and lock `research_idea.json` **before** your first experiment
-- run **2–4 materially different** experiments, then immediately promote the
-  selected result (never a 5th)
+- run **2–4 materially different** experiments — counted as **strategy lines**:
+  retries and seed-only repeats inside one line don't count, and a line is
+  established only by a complete experiment (rules §5.8) — then immediately
+  promote the selected result (never a 5th)
 - record every experiment in `experiment_trace.json`
 
 ## 3. The adapter
@@ -89,7 +91,10 @@ patches. Fill every TODO — the manifest is validated against
 Your fullrun wrapper follows the runner template in `scripts/runner/`:
 it mounts the contract and dataset read-only into a fresh workspace, injects
 the model endpoint via env (`OPENAI_BASE_URL` / `OPENAI_API_KEY` /
-`OPENAI_MODEL`), runs your framework natively, and collects the artifacts.
+`OPENAI_MODEL`), exports `WORKSPACE` (the fresh workspace path) and
+`DATASET_ROOT`, composes the task input at `input/prompt.txt` (see §4), runs
+your framework natively, and collects the artifacts. Locate your workspace
+through the `WORKSPACE` env var — never hardcode the path.
 
 **Model policy (rules §4):** self-testing uses your own model — the
 organizer recommends the one that behaves closest to the official
@@ -105,10 +110,17 @@ non-native and does not score.
 ## 4. Prompt.txt
 
 The organizer provides a unified task input per topic (contract + budget +
-task summary) named `prompt.txt`. Translating it into a form your framework
-can consume is the adapter's job. The prompt must **not prescribe any method**
-— algorithm family, feature representation, architecture, hyperparameters,
+task summary) named `prompt.txt`. The runner template composes it into the
+fresh workspace at `input/prompt.txt` from the contract, the execution
+budget, and a task summary you set during self-testing (export
+`PROMPT_TASK_SUMMARY` or fill it in the template) or the organizer provides
+at official evaluation. Translating it into a form your framework can
+consume is the adapter's job. The prompt must **not prescribe any method** —
+algorithm family, feature representation, architecture, hyperparameters,
 experiment order, selected method are all decided by your framework.
+
+The submitted `prompt.txt` is the exact file the runner mounted, and
+`PROVENANCE.json` `prompt_sha256` is its sha256 — self-test what you submit.
 
 ## 5. Submission
 
