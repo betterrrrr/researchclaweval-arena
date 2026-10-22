@@ -87,8 +87,9 @@ cp -r templates/example-adapter/ myframework/
 
 The manifest (`manifest.json`) declares: framework id, name, upstream
 repository, license, native entrypoint, required env, required images, and
-patches. Fill every TODO — the manifest is validated against
-`schemas/adapter.schema.json`.
+patches. Fill every TODO — validate locally against
+`schemas/adapter.schema.json` with
+`python3 scripts/validate_schemas.py --manifest myframework/manifest.json`.
 
 Your fullrun wrapper follows the runner template in `scripts/runner/`:
 it mounts the contract and dataset read-only into a fresh workspace, injects
@@ -99,8 +100,8 @@ your framework natively, and collects the artifacts. Locate your workspace
 through the `WORKSPACE` env var — never hardcode the path.
 
 **Model policy (rules §4):** self-testing uses your own model — the
-organizer recommends the one that behaves closest to the official
-environment, but does not restrict you. Official evaluation injects the
+organizer does not restrict you (the recommended self-test model is named in
+rules §4). Official evaluation injects the
 organizer's model over the same three env vars; never hardcode an endpoint
 or a model id in your code either way.
 
@@ -163,6 +164,12 @@ byte; a mismatch is rejected without scoring. `logs/e2e.log` is the primary
 record — the judge pipeline reads `logs/e2e.log` → `logs/native.log` →
 `logs/native_stdout.log`, never a root-level `run.log`.
 
+`PROVENANCE.json` is your self-reported submission ledger (no code validates
+it today) — fill `model` with the model id actually used for that run at
+export time, never an env var name. The model value that *is* machine-checked
+is `experiment_trace.json` `framework_internal_model`, which must equal the
+published official model at official evaluation (rules §4).
+
 ## 6. Common failure modes
 
 | Symptom | Likely cause |
@@ -172,6 +179,7 @@ record — the judge pipeline reads `logs/e2e.log` → `logs/native.log` →
 | ARC estimator rejected | `predict()` missing `mlp` param, wrong shape, or non-finite values — the official adapter fails closed |
 | `b0`/`bT` missing in your trace | ARC: no numeric `framework_visible_validation` record (contract §3.4) |
 | Run judged non-native | `FRAMEWORK_NATIVE_LOG_MARKER` missing or printed by the wrapper instead of the framework |
+| Gateway blips mid-run | wall-clock budgets still tick (rules §5.4); run tiny probes first, checkpoint, resume, client-side retry/backoff |
 | Rejected split | your dataset was re-split; use the frozen canonical split (sha256 in rules §3.3) |
 
 ## 7. Timeline

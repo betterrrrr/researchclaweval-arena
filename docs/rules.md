@@ -129,6 +129,8 @@ arc 是唯一不给框架真值的 topic——官方指标要比对真激活，�
 
 开源仓库，含框架源码与可复现说明。**主办方会读源码**（§7）。
 
+adapter 的 `manifest.json` 先本地自检再提交：`python3 scripts/validate_schemas.py --manifest <你的 manifest 路径>`（必需字段与格式见 `schemas/adapter.schema.json`；示例占位符 `NN`/`replace-me` 只允许出现在仓库自带的示例里）。
+
 ### 5.2 产物（每个 topic 一份）
 
 ```
@@ -161,6 +163,8 @@ arc 是唯一不给框架真值的 topic——官方指标要比对真激活，�
 用 runner 模板生成的 `<framework>_<topic>_fullrun.sh` 运行，不要用自己写的编排（见 `scripts/runner/` 模板与 `docs/participant_quickstart.md`）。
 
 理由：`logs/e2e.log` 由 runner 包装把框架自身的 stdout/stderr **实时 tee 落盘**，忠于框架的真实输出；评委结合原生标记、PROVENANCE 与实验轨迹一致性交叉核验其真实性（边界见附录 A）。
+
+> **网络波动与配额**：预算按契约的墙钟口径走表——TDC 的累计实验 3,600s / 总墙钟 7,200s 照常计时，断连与网关抖动**不豁免、不补时**；psydef/arc 以各自 execution budget 为准（无墙钟字段）。自测建议：先用小实验验证链路，定期 checkpoint 并断点续跑，重试与退避在框架客户端侧自行配置（注入的 relay 没有官方旋钮；社区榜判官侧自带重试）。
 
 ### 5.5 原生执行标记（最容易踩）
 

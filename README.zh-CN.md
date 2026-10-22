@@ -27,9 +27,9 @@
 
 | 任务 | 目标 | 官方指标 | 数据 |
 |---|---|---|---|
-| **TDC-ADMET-Tox** | 从分子结构预测三种毒性终点（AMES/hERG/DILI） | macro-AUROC ↑ | 1.4 MB |
-| **PsyDefDetect** | 从支持性对话识别心理防御机制 | macro-F1 ↑ | 5.4 MB |
-| **ARC-WBE-2026** | 从 Transformer 权重矩阵估计逐层激活 | 调整后分层得分 ↓ | 907 MB |
+| [**TDC-ADMET-Tox**](contracts/tdc_admet_tox_contract.md) | 从分子结构预测三种毒性终点（AMES/hERG/DILI） | macro-AUROC ↑ | 1.4 MB |
+| [**PsyDefDetect**](contracts/psydefdetect_contract.md) | 从支持性对话识别心理防御机制 | macro-F1 ↑ | 5.4 MB |
+| [**ARC-WBE-2026**](contracts/arc_wbe_2026_contract.md) | 从 Transformer 权重矩阵估计逐层激活 | 调整后分层得分 ↓ | 907 MB |
 
 主榜三列、逐任务排名，**不设总分冠军**（三个指标量纲不可并，合并得分会被校准伪影主导）。
 
@@ -51,7 +51,7 @@ export RUN_ROOT=/tmp/my-run
 bash scripts/runner/<your-id>_<your-framework>_<topic>_fullrun.sh
 ```
 
-完整流程见 [`docs/participant_quickstart.md`](docs/participant_quickstart.md)（英文）。
+完整流程见[快速上手·中文版](docs/participant_quickstart.zh-CN.md) / [英文版](docs/participant_quickstart.md);常见问题见 [FAQ·中文版](docs/FAQ.zh-CN.md) / [英文版](docs/FAQ.md)。
 
 ## 结构
 

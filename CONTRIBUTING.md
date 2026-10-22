@@ -15,6 +15,12 @@ design: contracts, official-scorer glue, templates, and documentation.
   same PR — the gate fails otherwise, by design.
 - **Keep contracts authoritative.** Changes to `contracts/` or `docs/rules.md`
   affect every participant; they are the product, not the appendage.
+- **Two languages, one ground truth.** `docs/` is split by language by design:
+  `rules.md` + `announcement.md` are Chinese; `FAQ.md`,
+  `participant_quickstart.md`, `metric-system.md`, `scorer-contracts.md`,
+  `validation-semantics.md` are English. A rule-level change must land in
+  *both* languages — translate it, or add a cross-reference line in the other
+  file — so neither version silently lags.
 
 ## Style
 

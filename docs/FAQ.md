@@ -15,8 +15,8 @@ merged without calibration artifacts dominating the result — see the
 
 **Q: Who provides the model?**
 Two stages. Self-testing (before submission): you bring your own model —
-the organizer does not restrict it (rules §4 recommends one that behaves
-closest to the official environment). Official evaluation (submission
+the organizer does not restrict it (the organizer's recommended self-test
+model is named in rules §4). Official evaluation (submission
 scoring): the organizer injects the model via `OPENAI_BASE_URL` /
 `OPENAI_API_KEY` / `OPENAI_MODEL`; bringing your own model or endpoint at
 that stage is grounds for rejection. This is a framework contest, not a
@@ -108,7 +108,16 @@ rather than your own ad-hoc orchestration so the artifacts are attributable
 `templates/example-adapter/manifest.json` — validated against
 `schemas/adapter.schema.json` (framework id, name, upstream repo, license,
 native entrypoint, required env/images, patches). Fill every TODO, that's
-the entire integration surface.
+the entire integration surface. Validate locally with
+`python3 scripts/validate_schemas.py --manifest <your-manifest.json>`.
+
+**Q: What if the network flaps mid-run?**
+The wall-clock budgets in the contracts keep running — a gateway blip is
+not an exemption. Self-testing advice: prove the link with a tiny
+experiment first, checkpoint your state, and resume from checkpoints;
+configure client-side retries/backoff on your side (there is no official
+knob on the injected relay; the community-board judge has its own retries,
+rules §5.4).
 
 **Q: Does the judge pipeline need a key from me?**
 The judge runs organizer-side. The code reads `JUDGE_API_KEY` /

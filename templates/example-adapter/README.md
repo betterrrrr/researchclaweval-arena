@@ -16,7 +16,10 @@ owned by your framework during the run (rules §7.2).
 1. `manifest.json` — `framework_id` (`NN`), `name`, `upstream_url`,
    `upstream_commit`, `license_spdx`, `native_entrypoint` (+ source file),
    `required_images` (or remove if none), `patches` (or `[]`).
-   Validated against `schemas/adapter.schema.json`.
+   Validate locally against `schemas/adapter.schema.json`:
+   ```
+   python3 scripts/validate_schemas.py --manifest manifest.json
+   ```
 2. `entrypoint.example.py` — replace with a pointer to (or a thin launcher
    of) your framework's real native entrypoint. The launched process, not the
    wrapper, must own the whole research flow.
@@ -38,7 +41,8 @@ owned by your framework during the run (rules §7.2).
 ## Runner
 
 `scripts/runner/my_framework_wrapper.sh` is the generic runner template:
-it mounts contract + dataset read-only, injects the provider env, runs your
+it mounts contract + dataset read-only, injects the provider env, exports
+`WORKSPACE` / `DATASET_ROOT`, composes `input/prompt.txt`, runs your
 entrypoint in a fresh workspace, and collects `logs/e2e.log`. Copy it per
 topic as `<id>_<framework>_<topic>_fullrun.sh` and fill the topic parameters
 (contract path, dataset env, budget, payload expectations).

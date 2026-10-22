@@ -6,7 +6,7 @@
 
 **Registration open · 1-month competition · Evaluation protocol fully public**
 
-[中文说明](README.zh-CN.md)
+[中文说明](README.zh-CN.md) · [比赛公告](docs/announcement.md) · [Rules](docs/rules.md)
 
 ---
 

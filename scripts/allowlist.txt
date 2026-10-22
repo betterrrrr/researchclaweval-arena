@@ -12,8 +12,10 @@ contracts/tdc_admet_tox_submission_spec.md
 CONTRIBUTING.md
 docs/announcement.md
 docs/FAQ.md
+docs/FAQ.zh-CN.md
 docs/metric-system.md
 docs/participant_quickstart.md
+docs/participant_quickstart.zh-CN.md
 docs/rules.md
 docs/scorer-contracts.md
 docs/validation-semantics.md
