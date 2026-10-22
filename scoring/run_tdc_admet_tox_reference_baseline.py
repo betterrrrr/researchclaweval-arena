@@ -312,8 +312,9 @@ def run_baseline(public_root: Path, output_root: Path) -> Path:
     # raw run log at the run root logs/ — the audit takes --run-root and
     # expects exactly this shape
     ws = output_root / "workspace"
-    ws.mkdir()
-    (output_root / "logs").mkdir()
+    ws.mkdir(parents=True, exist_ok=True)
+    (ws / "runs").mkdir(parents=True, exist_ok=True)
+    (output_root / "logs").mkdir(parents=True, exist_ok=True)
     experiments: list[dict[str, object]] = []
     claims: list[dict[str, object]] = []
     paper_rows: list[str] = []
@@ -321,7 +322,7 @@ def run_baseline(public_root: Path, output_root: Path) -> Path:
         experiment_started = time.monotonic()
         run_id = str(configuration["run_id"])
         run_root = ws / "runs" / run_id
-        run_root.mkdir()
+        run_root.mkdir(parents=True, exist_ok=True)
         config_path = run_root / "config.json"
         prediction_path = run_root / "validation_predictions.csv"
         metrics_path = run_root / "metrics.json"
