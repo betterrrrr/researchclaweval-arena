@@ -25,6 +25,8 @@ out/
 results/*
 !results/README.md
 logs/
+!templates/submission/golden_tdc_admet_tox/logs/
+!templates/submission/golden_tdc_admet_tox/logs/e2e.log
 *.score.json
 score.json
 leaderboard/results.json

@@ -50,4 +50,7 @@ validator is changed, this tree is the first thing that must still pass.
 
 `model`, `dataset_sha256`/`split_sha256`/`prompt_sha256`/`contract_sha256`,
 and the run id are fill-in values — replace them with your own run's values
-before submitting (see the PROVENANCE template).
+before submitting (see the PROVENANCE template). The probability values in
+the CSV payloads are illustrative only (they need not relate to the AUROC
+metrics; the audit requires a real held-out evaluation of the promoted
+configuration in your actual run).

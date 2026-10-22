@@ -141,7 +141,7 @@ Per topic, one artifact set:
 │   ├── final_report.md
 │   └── <topic payload>      # predictions.csv | predictions.jsonl | estimator.py
 ├── logs/e2e.log             # raw stdout/stderr of the run
-├── prompt.txt
+├── prompt.txt               # the exact mounted task input (runner writes it at workspace/input/prompt.txt, §4)
 └── source/                  # optional: research code produced by the framework
 ```
 

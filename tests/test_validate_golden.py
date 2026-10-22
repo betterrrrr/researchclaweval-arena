@@ -55,11 +55,25 @@ def test_resource_budget_anchor_matches_golden() -> None:
     assert trace["resource_budget"] == anchors["topics"]["tdc_admet_tox"]
 
 
+def test_golden_log_is_tracked() -> None:
+    # .gitignore has a bare "logs/" rule; if it ever swallows the golden run's
+    # log again, clean CI checkouts lose logs/e2e.log and both this suite and
+    # scripts/selfcheck_tdc.sh fail on a tree that is green locally.
+    r = subprocess.run(
+        ["git", "-C", str(ROOT), "ls-files", "--error-unmatch",
+         "templates/submission/golden_tdc_admet_tox/logs/e2e.log"],
+        capture_output=True,
+        text=True,
+    )
+    assert r.returncode == 0, f"golden logs/e2e.log must be tracked, not git-ignored:\n{r.stderr}"
+
+
 def main() -> None:
     tests = [
         test_golden_passes,
         test_logs_must_be_at_run_root,
         test_resource_budget_anchor_matches_golden,
+        test_golden_log_is_tracked,
     ]
     failures = 0
     for t in tests:

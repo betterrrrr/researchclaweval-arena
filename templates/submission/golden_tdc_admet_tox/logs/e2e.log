@@ -1,0 +1,11 @@
+[runner] run id: 01-example-golden-framework-tdc_admet_tox-20261020T000000
+[runner] topic:  tdc_admet_tox
+[runner] the framework must print MYFRAMEWORK_NATIVE from inside its own execution
+[framework] MYFRAMEWORK_NATIVE
+[framework] loaded contract: input/contract.md
+[exp_001] morgan_radius_2_1024_bits / logistic_regression_unweighted
+[exp_002] morgan_radius_2_2048_bits / logistic_regression_balanced
+[framework] promoted exp_002 (best validation macro AUROC)
+[framework] wrote root-level predictions.csv
+[runner] artifacts must be in the workspace (research_idea.json / experiment_trace.json / final_report.md / topic payload)
+[runner] finished

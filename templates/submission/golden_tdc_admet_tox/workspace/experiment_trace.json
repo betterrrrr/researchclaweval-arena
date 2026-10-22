@@ -20,7 +20,7 @@
   "reproduction": {
     "entrypoint": "reproduce.sh",
     "command": "bash reproduce.sh",
-    "seed": 42
+    "seed": 43
   },
   "idea_locked_before_experiments": true,
   "experiments": [

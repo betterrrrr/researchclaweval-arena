@@ -87,6 +87,7 @@ templates/example-adapter/entrypoint.example.py
 templates/example-adapter/manifest.json
 templates/example-adapter/README.md
 templates/submission/environment.json.template
+templates/submission/golden_tdc_admet_tox/logs/e2e.log
 templates/submission/golden_tdc_admet_tox/PROVENANCE.json
 templates/submission/golden_tdc_admet_tox/README.md
 templates/submission/golden_tdc_admet_tox/workspace/environment.json

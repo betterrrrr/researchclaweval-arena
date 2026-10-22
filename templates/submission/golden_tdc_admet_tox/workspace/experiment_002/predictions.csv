@@ -1,4 +1,4 @@
 sample_id,endpoint,probability
-AMES_test_000001,AMES,0.82
-HERG_test_000001,hERG,0.752
-DILI_test_000001,DILI,0.732
+AMES_test_000001,AMES,0.607
+HERG_test_000001,hERG,0.521
+DILI_test_000001,DILI,0.586

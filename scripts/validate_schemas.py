@@ -11,6 +11,7 @@ Usage:
   python3 scripts/validate_schemas.py --manifest  FILE
   python3 scripts/validate_schemas.py --provenance FILE
   python3 scripts/validate_schemas.py --trace      FILE
+  python3 scripts/validate_schemas.py --environment FILE
   python3 scripts/validate_schemas.py --all-repo        # the templates shipped in this repo
 
 All modes print one JSON payload on stdout and exit 0 (passed) or 1
@@ -145,6 +146,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--provenance", type=Path)
     parser.add_argument("--trace", type=Path)
+    parser.add_argument("--environment", type=Path)
     parser.add_argument("--all-repo", action="store_true")
     args = parser.parse_args(argv)
 
@@ -154,6 +156,7 @@ def main(argv: list[str] | None = None) -> int:
             ("manifest", ADAPTER_SCHEMA, None, MANIFEST),
             ("provenance", RUNS_SCHEMA, "provenance", GOLDEN / "PROVENANCE.json"),
             ("trace", RUNS_SCHEMA, "trace", GOLDEN / "workspace" / "experiment_trace.json"),
+            ("environment", RUNS_SCHEMA, "environment", GOLDEN / "workspace" / "environment.json"),
         ]
     else:
         if args.manifest:
@@ -162,8 +165,10 @@ def main(argv: list[str] | None = None) -> int:
             checks.append(("provenance", RUNS_SCHEMA, "provenance", args.provenance))
         if args.trace:
             checks.append(("trace", RUNS_SCHEMA, "trace", args.trace))
+        if args.environment:
+            checks.append(("environment", RUNS_SCHEMA, "environment", args.environment))
     if not checks:
-        parser.error("pass one of --manifest / --provenance / --trace / --all-repo")
+        parser.error("pass one of --manifest / --provenance / --trace / --environment / --all-repo")
 
     results: dict[str, list[str]] = {}
     failed = False

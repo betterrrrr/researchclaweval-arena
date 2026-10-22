@@ -16,6 +16,7 @@ VALIDATOR = ROOT / "scripts" / "validate_schemas.py"
 MANIFEST = ROOT / "templates" / "example-adapter" / "manifest.json"
 PROVENANCE = ROOT / "templates" / "submission" / "golden_tdc_admet_tox" / "PROVENANCE.json"
 TRACE = ROOT / "templates" / "submission" / "golden_tdc_admet_tox" / "workspace" / "experiment_trace.json"
+ENVIRONMENT = ROOT / "templates" / "submission" / "golden_tdc_admet_tox" / "workspace" / "environment.json"
 
 
 def run_validator(*args: str) -> subprocess.CompletedProcess:
@@ -65,6 +66,22 @@ def test_trace_golden_passes() -> None:
     assert r.returncode == 0, f"golden trace must validate:\n{r.stdout}{r.stderr}"
 
 
+def test_environment_golden_passes() -> None:
+    r = run_validator("--environment", str(ENVIRONMENT))
+    assert r.returncode == 0, f"golden environment.json must validate:\n{r.stdout}{r.stderr}"
+
+
+def test_broken_environment_fails() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        path = Path(td) / "environment.json"
+        payload = json.loads(ENVIRONMENT.read_text(encoding="utf-8"))
+        del payload["python_version"]  # one of the six required fields
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        r = run_validator("--environment", str(path))
+        assert r.returncode != 0, "missing python_version must fail"
+        assert "python_version" in r.stdout, r.stdout
+
+
 def main() -> None:
     tests = [
         test_all_repo_passes,
@@ -73,6 +90,8 @@ def main() -> None:
         test_provenance_golden_passes,
         test_broken_provenance_fails,
         test_trace_golden_passes,
+        test_environment_golden_passes,
+        test_broken_environment_fails,
     ]
     failures = 0
     for t in tests:

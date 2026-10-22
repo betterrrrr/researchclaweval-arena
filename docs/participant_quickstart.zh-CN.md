@@ -96,7 +96,7 @@ python3 scripts/validate_schemas.py --manifest myframework/manifest.json
 │   ├── final_report.md
 │   └── <topic 载荷>          # predictions.csv | predictions.jsonl | estimator.py
 ├── logs/e2e.log             # 运行时的原始 stdout/stderr
-├── prompt.txt
+├── prompt.txt               # 喂给框架的任务输入原文（runner 挂载于 workspace/input/prompt.txt，提交原件，§4）
 └── source/                  # 可选:框架生成的研究代码
 ```
 

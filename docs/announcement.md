@@ -103,7 +103,7 @@ workspace/
   final_report.md          最终报告
   <subtask 载荷>            预测文件 / 估计器
 logs/e2e.log               完整执行日志
-prompt.txt                 你喂给框架的任务输入原文
+prompt.txt                 任务输入原文（runner 挂载于 workspace/input/，提交原件）
 PROVENANCE.json            溯源信息（模型、提交号、数据 sha256）
 ```
 

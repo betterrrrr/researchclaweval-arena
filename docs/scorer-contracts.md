@@ -30,7 +30,7 @@ stdout; exit `0` on success and `1` on failure (usage errors exit `2`).
 | `validate_tdc_admet_tox_run.py` | `--run-root` `--stage` [`--public-dataset-root`] | audit payload JSON on stdout, exit 0 | `{"status":"failed","error":…}` JSON on stdout, exit 1 |
 | `run_tdc_admet_tox_validation_score.py` | `--validation` `--predictions` `--output-metrics` | metrics payload JSON on stdout, exit 0 | plain-text error, exit 1 |
 | `run_tdc_admet_tox_host_score.py` | `--public-dataset-root` `--hidden-labels` `--predictions` `--output-score` | score payload JSON on stdout, exit 0 | plain-text error, exit 1 |
-| `scripts/check-release.sh` | `--path DIR` | `check-release.sh: PASS` on stdout, exit 0 | `FINDING: …` lines on stderr, exit 1 (2 = usage) |
+| `scripts/check-release.sh` | `--path DIR` | `check-release.sh: PASS` on stdout, exit 0 | `FINDING: …` lines on stderr, exit 1 (usage errors also exit 1) |
 | `scripts/check_native_marker.sh` | `<log-or-run-root>` `[MARKER]` | `PASS:` on stdout, exit 0 | `FAIL:` on stderr, exit 1 |
 | `scripts/validate_schemas.py` | `--manifest|--provenance|--trace FILE`, `--all-repo` | `{"status":"passed",…}` JSON, exit 0 | `{"status":"failed","errors":…}` JSON, exit 1 |
 | `scripts/selfcheck_tdc.sh` | none | `[selfcheck] TDC-ADMET-Tox selfcheck: PASS`, exit 0 | first failing step, exit non-zero |

@@ -111,6 +111,14 @@ native entrypoint, required env/images, patches). Fill every TODO, that's
 the entire integration surface. Validate locally with
 `python3 scripts/validate_schemas.py --manifest <your-manifest.json>`.
 
+**Q: What exactly is `resource_budget` in my trace?**
+The declared compute budget, recorded verbatim: the audit compares it byte
+for byte. The canonical dict is documented in
+`contracts/tdc_admet_tox_compute_budget.md` (with a copyable JSON example)
+and machine-readable in `scoring/resource_budget.anchors.json` — copy the
+value from there, never from decoded error messages. It includes
+`network_policy: "injected_llm_relay_only"` (rules §5.4).
+
 **Q: What if the network flaps mid-run?**
 The wall-clock budgets in the contracts keep running — a gateway blip is
 not an exemption. Self-testing advice: prove the link with a tiny

@@ -144,7 +144,7 @@ adapter 的 `manifest.json` 先本地自检再提交：`python3 scripts/validate
 │   └── <topic 载荷>          # 见 5.3
 ├── logs/
 │   └── e2e.log              # 必需：运行时的原始 stdout/stderr 流
-├── prompt.txt               # 必需：喂给框架的任务输入原文
+├── prompt.txt               # 必需：喂给框架的任务输入原文（runner 挂载于 workspace/input/prompt.txt；提交原件）
 └── source/                  # 建议：框架生成的研究代码
 ```
 
