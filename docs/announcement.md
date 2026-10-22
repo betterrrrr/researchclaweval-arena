@@ -97,6 +97,7 @@ bash scripts/runner/<your-id>_<your-framework>_<topic>_fullrun.sh
 workspace/
   research_idea.json       研究思路（必须在第一次实验前锁定）
   experiment_trace.json    实验轨迹（每次实验与其结果）
+  environment.json         运行环境（6 个必填字段）+ 可复现信息
   final_report.md          最终报告
   <subtask 载荷>            预测文件 / 估计器
 logs/e2e.log               完整执行日志

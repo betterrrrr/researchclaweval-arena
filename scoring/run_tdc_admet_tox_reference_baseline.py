@@ -308,7 +308,11 @@ def run_baseline(public_root: Path, output_root: Path) -> Path:
     test_rows = read_public_csv(test_path, labeled=False)
 
     output_root.mkdir(parents=True, exist_ok=True)
-    (output_root / "runs").mkdir()
+    # run-root layout per docs/rules.md §5.2: all artifacts under workspace/,
+    # raw run log at the run root logs/ — the audit takes --run-root and
+    # expects exactly this shape
+    ws = output_root / "workspace"
+    ws.mkdir()
     (output_root / "logs").mkdir()
     experiments: list[dict[str, object]] = []
     claims: list[dict[str, object]] = []
@@ -316,7 +320,7 @@ def run_baseline(public_root: Path, output_root: Path) -> Path:
     for configuration in CONFIGURATIONS:
         experiment_started = time.monotonic()
         run_id = str(configuration["run_id"])
-        run_root = output_root / "runs" / run_id
+        run_root = ws / "runs" / run_id
         run_root.mkdir()
         config_path = run_root / "config.json"
         prediction_path = run_root / "validation_predictions.csv"
@@ -362,10 +366,10 @@ def run_baseline(public_root: Path, output_root: Path) -> Path:
             "hypothesis": configuration["hypothesis"],
             "model_strategy": configuration["model_strategy"],
             "feature_strategy": configuration["feature_strategy"],
-            "config_file": str(config_path.relative_to(output_root)),
-            "prediction_file": str(prediction_path.relative_to(output_root)),
-            "metrics_file": str(metrics_path.relative_to(output_root)),
-            "log_file": str(log_path.relative_to(output_root)),
+            "config_file": str(config_path.relative_to(ws)),
+            "prediction_file": str(prediction_path.relative_to(ws)),
+            "metrics_file": str(metrics_path.relative_to(ws)),
+            "log_file": str(log_path.relative_to(ws)),
             "runtime_seconds": runtime_seconds,
             "seed": SEED,
             "candidate_count": 1,
@@ -419,9 +423,9 @@ def run_baseline(public_root: Path, output_root: Path) -> Path:
     test_predictions = fit_predict_configuration(
         selected_configuration, refit_rows, test_rows, dependencies
     )
-    write_predictions(output_root / "predictions.csv", test_predictions)
+    write_predictions(ws / "predictions.csv", test_predictions)
 
-    shutil.copy2(Path(__file__).resolve(), output_root / "reproduce.py")
+    shutil.copy2(Path(__file__).resolve(), ws / "reproduce.py")
     environment = {
         "python_version": platform.python_version(),
         "platform": platform.platform(),
@@ -434,13 +438,19 @@ def run_baseline(public_root: Path, output_root: Path) -> Path:
         },
         "created_at": now_iso(),
     }
-    (output_root / "environment.json").write_text(
+    (ws / "environment.json").write_text(
         json.dumps(environment, ensure_ascii=True, indent=2) + "\n", encoding="utf-8"
     )
     total_wall_seconds = time.monotonic() - started
     trace = {
         "task_id": TASK_ID,
         "reference_non_ranking": True,
+        "framework_native_execution": True,
+        "consumed_topic_input": True,
+        # scaffold placeholders — a real framework run must record the actual
+        # injected model id and base URL (rules §4), not these values
+        "framework_internal_model": "reference-baseline-local-model",
+        "framework_internal_api_base_url": "reference-baseline-local-v0",
         "experiments": experiments,
         "selected_experiment_id": selected["run_id"],
         "selection_metric": "validation_macro_average_auroc",
@@ -458,7 +468,7 @@ def run_baseline(public_root: Path, output_root: Path) -> Path:
         "total_wall_seconds": total_wall_seconds,
         "claims": claims,
     }
-    (output_root / "experiment_trace.json").write_text(
+    (ws / "experiment_trace.json").write_text(
         json.dumps(trace, ensure_ascii=True, indent=2) + "\n", encoding="utf-8"
     )
     paper = "\n".join(
@@ -475,7 +485,7 @@ def run_baseline(public_root: Path, output_root: Path) -> Path:
             "",
         ]
     )
-    (output_root / "paper.md").write_text(paper, encoding="utf-8")
+    (ws / "paper.md").write_text(paper, encoding="utf-8")
     (output_root / "logs" / "baseline.log").write_text(
         json.dumps(
             {

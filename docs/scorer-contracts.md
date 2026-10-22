@@ -5,6 +5,42 @@ scripts in `scoring/` do. All scripts are glue around the official scorers —
 the scoring code is not vendored here; install the official packages as
 described below, and run the glue.
 
+## Installation
+
+The glue in `scoring/` is standard-library-only. Only the ARC tooling
+imports third-party packages, lazily (`whestbench`, `datasets`, `pyarrow`);
+install them from `scoring/requirements.txt` when you run ARC glue:
+
+```bash
+pip install -r scoring/requirements.txt   # optional — ARC tooling only
+```
+
+Pin exact versions for the release bundle per the official toolkit pages
+(see the ARC section below). The TDC/psydef scorers and the artifact
+validator never import third-party code.
+
+## CLI conventions
+
+Every scoring/validation entry point follows one contract so scripts and CI
+can compose them. Three rules: arguments via `argparse`; one JSON payload on
+stdout; exit `0` on success and `1` on failure (usage errors exit `2`).
+
+| entry point | args | success | failure |
+|---|---|---|---|
+| `validate_tdc_admet_tox_run.py` | `--run-root` `--stage` [`--public-dataset-root`] | audit payload JSON on stdout, exit 0 | `{"status":"failed","error":…}` JSON on stdout, exit 1 |
+| `run_tdc_admet_tox_validation_score.py` | `--validation` `--predictions` `--output-metrics` | metrics payload JSON on stdout, exit 0 | plain-text error, exit 1 |
+| `run_tdc_admet_tox_host_score.py` | `--public-dataset-root` `--hidden-labels` `--predictions` `--output-score` | score payload JSON on stdout, exit 0 | plain-text error, exit 1 |
+| `scripts/check-release.sh` | `--path DIR` | `check-release.sh: PASS` on stdout, exit 0 | `FINDING: …` lines on stderr, exit 1 (2 = usage) |
+| `scripts/check_native_marker.sh` | `<log-or-run-root>` `[MARKER]` | `PASS:` on stdout, exit 0 | `FAIL:` on stderr, exit 1 |
+| `scripts/validate_schemas.py` | `--manifest|--provenance|--trace FILE`, `--all-repo` | `{"status":"passed",…}` JSON, exit 0 | `{"status":"failed","errors":…}` JSON, exit 1 |
+| `scripts/selfcheck_tdc.sh` | none | `[selfcheck] TDC-ADMET-Tox selfcheck: PASS`, exit 0 | first failing step, exit non-zero |
+
+`--output-metrics` (validation scorer) and `--output-score` (host scorer)
+are intentionally different flags: the first emits a metrics payload, the
+second a scored payload; both are JSON. Python entry points print JSON;
+bash scripts stay shell-native and only their exit codes (0 / 1 / 2) are
+part of the contract.
+
 ## TDC-ADMET-Tox — `macro_average_auroc`
 
 Three endpoints (AMES / hERG / DILI); the main score is the unweighted mean
@@ -18,6 +54,7 @@ are secondary diagnostics and never enter the score.
 | `run_tdc_admet_tox_reference_baseline.py` | builds and scores a reference baseline run (`reproduce.py` reproduces it) — the reference implementation teams can start from. |
 | `export_tdc_admet_tox_official_splits.py` | (re)exports the frozen endpoint splits from the archive. |
 | `prepare_tdc_admet_tox_from_archive.py` | materializes `public/{train,validation,test}.csv` from `admet_group.zip`; used by `scripts/setup_datasets.sh`. |
+| `scripts/selfcheck_tdc.sh` | one-command TDC self-check: audits the golden run, then — when `TDC_ADMET_TOX_DATASET_ROOT` is set — runs the reference baseline and audits its output with the same validator. |
 
 **Dataset licensing:** TDC-ADMET-Tox data comes from Harvard Dataverse
 (`doi:10.7910/DVN/21LKWG`), used under Dataverse terms; see

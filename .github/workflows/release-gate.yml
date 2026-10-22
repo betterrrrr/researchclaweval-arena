@@ -29,6 +29,12 @@ jobs:
           python3 -m py_compile scoring/*.py
           bash -n scripts/*.sh scripts/runner/*.sh
           python3 -c "import json,glob; [json.load(open(f)) for f in glob.glob('schemas/*.json')+glob.glob('scoring/*.json')+glob.glob('templates/**/*.json',recursive=True)]"
+          python3 scripts/validate_schemas.py --all-repo
           bash scripts/check-release.sh --path templates
           bash scripts/check-release.sh --path schemas
           python3 tests/test_release_safety.py
+          python3 tests/test_validate_golden.py
+          python3 tests/test_runner_smoke.py
+          python3 tests/test_native_marker.py
+          python3 tests/test_validate_schemas.py
+          bash scripts/selfcheck_tdc.sh

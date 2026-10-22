@@ -21,8 +21,9 @@ design: contracts, official-scorer glue, templates, and documentation.
 - Shell: `bash -n` clean, `set -euo pipefail` where applicable, POSIX-sh
   friendly where easy.
 - Python: `python3 -m py_compile` clean; no third-party runtime dependencies
-  for the glue (scoring scripts may import numpy / pandas / whest when
-  installed by the user, per `docs/scorer-contracts.md`).
+  for the glue (the ARC scoring scripts may import whestbench / datasets /
+  pyarrow when installed by the user — see `scoring/requirements.txt` and
+  `docs/scorer-contracts.md`).
 - Docs: plain English or Chinese where the surrounding file uses it; no
   internal vocabulary from competitor-facing text (see `docs/FAQ.md`).
 

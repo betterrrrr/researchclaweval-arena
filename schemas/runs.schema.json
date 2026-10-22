@@ -1,5 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "runs.schema.json",
+  "title": "Run ledger records and artifact structures (docs/rules.md §5.2)",
   "type": "object",
   "required": ["schema_version", "runs"],
   "additionalProperties": false,
@@ -22,6 +24,123 @@
           "required_paths": {"type": "array", "items": {"type": "string"}},
           "required_images": {"type": "array", "items": {"type": "string"}}
         }
+      }
+    }
+  },
+  "$defs": {
+    "resourceBudget": {
+      "description": "The exact dict recorded in experiment_trace.json; values come from scoring/resource_budget.anchors.json and are compared byte-for-byte by the audit.",
+      "type": "object",
+      "required": ["cpu_cores", "memory_gib", "gpu_count", "workspace_disk_gib", "max_experiment_runtime_seconds", "max_total_wall_seconds", "network_policy"],
+      "additionalProperties": false,
+      "properties": {
+        "cpu_cores": {"type": "integer"},
+        "memory_gib": {"type": "integer"},
+        "gpu_count": {"type": "integer"},
+        "workspace_disk_gib": {"type": "integer"},
+        "max_experiment_runtime_seconds": {"type": "integer"},
+        "max_total_wall_seconds": {"type": "integer"},
+        "network_policy": {"enum": ["injected_llm_relay_only"]}
+      }
+    },
+    "reproduction": {
+      "type": "object",
+      "required": ["entrypoint", "command", "seed"],
+      "additionalProperties": false,
+      "properties": {
+        "entrypoint": {"type": "string", "minLength": 1},
+        "command": {"type": "string", "minLength": 1},
+        "seed": {"type": "integer"}
+      }
+    },
+    "environment": {
+      "description": "Workspace root-level environment.json (audited by validate_environment).",
+      "type": "object",
+      "required": ["python_version", "platform", "device", "seeds", "packages", "created_at"],
+      "additionalProperties": true,
+      "properties": {
+        "python_version": {"type": "string", "minLength": 1},
+        "platform": {"type": "string", "minLength": 1},
+        "device": {"type": "string", "minLength": 1},
+        "seeds": {"type": "array", "items": {"type": "integer"}},
+        "packages": {"type": "object"},
+        "created_at": {"type": "string", "minLength": 1}
+      }
+    },
+    "provenance": {
+      "description": "Run-root PROVENANCE.json — the self-reported submission ledger (templates/submission/PROVENANCE.json.template).",
+      "type": "object",
+      "required": ["framework_commit", "framework_id", "framework", "topic", "model", "dataset_sha256", "split_sha256", "prompt_sha256", "contract_sha256", "run_id", "native_marker_present", "experiment_count"],
+      "additionalProperties": false,
+      "properties": {
+        "framework_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "framework_id": {"type": "string", "pattern": "^[0-9]{2}$"},
+        "framework": {"type": "string", "minLength": 1},
+        "topic": {"type": "string", "minLength": 1},
+        "model": {"type": "string", "minLength": 1},
+        "dataset_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "split_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "prompt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "contract_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "run_id": {"type": "string", "minLength": 1},
+        "native_marker_present": {"type": "boolean"},
+        "experiment_count": {"type": "integer", "minimum": 2, "maximum": 4}
+      }
+    },
+    "claim": {
+      "type": "object",
+      "required": ["claim_id", "source_run_id", "endpoint", "metric", "value", "prediction_file", "config_file", "log_file"],
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {"type": "string", "pattern": "^[A-Za-z0-9_.:-]+$"},
+        "source_run_id": {"type": "string", "minLength": 1},
+        "endpoint": {"type": "string", "minLength": 1},
+        "metric": {"type": "string", "minLength": 1},
+        "value": {"type": "number"},
+        "prediction_file": {"type": "string", "minLength": 1},
+        "config_file": {"type": "string", "minLength": 1},
+        "log_file": {"type": "string", "minLength": 1}
+      }
+    },
+    "experiment": {
+      "type": "object",
+      "required": ["run_id", "status", "hypothesis", "model_strategy", "feature_strategy", "runtime_seconds", "seed", "candidate_count", "config_file", "prediction_file", "metrics_file", "log_file"],
+      "additionalProperties": true,
+      "properties": {
+        "run_id": {"type": "string", "minLength": 1},
+        "status": {"const": "complete"},
+        "hypothesis": {"type": "string", "minLength": 1},
+        "model_strategy": {"type": "string", "minLength": 1},
+        "feature_strategy": {"type": "string", "minLength": 1},
+        "runtime_seconds": {"type": "number"},
+        "seed": {"type": "integer"},
+        "candidate_count": {"const": 1},
+        "config_file": {"type": "string", "minLength": 1},
+        "prediction_file": {"type": "string", "minLength": 1},
+        "metrics_file": {"type": "string", "minLength": 1},
+        "log_file": {"type": "string", "minLength": 1}
+      }
+    },
+    "trace": {
+      "description": "Workspace root-level experiment_trace.json for tdc_admet_tox. The audit enforces the full semantics (docs/validation-semantics.md); this schema covers the required structure.",
+      "type": "object",
+      "required": ["task_id", "framework_native_execution", "consumed_topic_input", "framework_internal_model", "framework_internal_api_base_url", "selection_metric", "final_prediction_file", "resource_budget", "total_wall_seconds", "environment_file", "reproduction", "experiments", "claims", "selected_experiment_id"],
+      "additionalProperties": true,
+      "properties": {
+        "task_id": {"const": "tdc_admet_tox"},
+        "framework_native_execution": {"const": true},
+        "consumed_topic_input": {"const": true},
+        "framework_internal_model": {"type": "string", "minLength": 1},
+        "framework_internal_api_base_url": {"type": "string", "minLength": 1},
+        "selection_metric": {"const": "validation_macro_average_auroc"},
+        "final_prediction_file": {"const": "predictions.csv"},
+        "resource_budget": {"$ref": "#/$defs/resourceBudget"},
+        "total_wall_seconds": {"type": "number"},
+        "environment_file": {"minLength": 1},
+        "reproduction": {"$ref": "#/$defs/reproduction"},
+        "experiments": {"type": "array", "minItems": 2, "maxItems": 4, "items": {"$ref": "#/$defs/experiment"}},
+        "claims": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/claim"}},
+        "selected_experiment_id": {"type": "string", "minLength": 1}
       }
     }
   }

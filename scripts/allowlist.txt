@@ -58,6 +58,7 @@ scoring/make_arc_wbe_2026_visible_validation.py
 scoring/metric_anchors.json
 scoring/prepare_arc_wbe_2026_dataset.py
 scoring/prepare_tdc_admet_tox_from_archive.py
+scoring/requirements.txt
 scoring/resource_budget.anchors.json
 scoring/run_arc_wbe_2026_local_score.py
 scoring/run_psydefdetect_local_score.py
@@ -66,11 +67,14 @@ scoring/run_tdc_admet_tox_reference_baseline.py
 scoring/run_tdc_admet_tox_validation_score.py
 scoring/validate_tdc_admet_tox_run.py
 scripts/allowlist.txt
+scripts/check_native_marker.sh
 scripts/check-release.sh
 scripts/forbidden-hosts.txt
 scripts/gitleaks.toml
 scripts/runner/my_framework_wrapper.sh
+scripts/selfcheck_tdc.sh
 scripts/setup_datasets.sh
+scripts/validate_schemas.py
 SECURITY.md
 tdc_admet_tox_split.canonical.json
 tdc_admet_tox_split.canonical.json.sha256
@@ -80,6 +84,7 @@ templates/admission/native_prompt_audit.v1.json
 templates/example-adapter/entrypoint.example.py
 templates/example-adapter/manifest.json
 templates/example-adapter/README.md
+templates/submission/environment.json.template
 templates/submission/golden_tdc_admet_tox/PROVENANCE.json
 templates/submission/golden_tdc_admet_tox/README.md
 templates/submission/golden_tdc_admet_tox/workspace/environment.json
@@ -100,7 +105,9 @@ templates/submission/golden_tdc_admet_tox/workspace/research_idea.json
 templates/submission/prompt.txt.template
 templates/submission/PROVENANCE.json.template
 templates/submission/README.md
+tests/test_native_marker.py
 tests/test_release_safety.py
 tests/test_runner_smoke.py
 tests/test_validate_golden.py
+tests/test_validate_schemas.py
 THIRD_PARTY_NOTICES.md

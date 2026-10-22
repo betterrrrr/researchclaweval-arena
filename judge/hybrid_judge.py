@@ -87,7 +87,7 @@ PROMPT_HEADER = """# 科研代理运行评审任务
 - `research_idea.json`    —— 框架自己写的研究计划
 - `experiment_trace.json` —— 框架自己记录的实验轨迹
 - `final_report.md`       —— 框架自己写的最终报告
-- `e2e.log`               —— **宿主抓取的端到端执行日志**，框架改不了它
+- `e2e.log`               —— runner 把框架自身 stdout/stderr **实时 tee 落盘**的端到端执行日志
 
 ## 重要
 

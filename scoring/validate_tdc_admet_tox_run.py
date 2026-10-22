@@ -638,7 +638,7 @@ def main(argv: list[str] | None = None) -> int:
                 {"task_id": TASK_ID, "stage": args.stage, "status": "failed", "error": str(exc)}
             )
         )
-        return 13
+        return 1  # CLI conventions: 0 = passed, 1 = failed (docs/scorer-contracts.md)
     print(json.dumps(payload, ensure_ascii=True, indent=2))
     return 0
 

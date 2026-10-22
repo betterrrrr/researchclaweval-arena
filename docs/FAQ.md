@@ -70,7 +70,7 @@ them the extended dimensions fall back to the judge's ordinal path.
 Most likely the native marker is missing: `FRAMEWORK_NATIVE_LOG_MARKER` must
 be printed by *your framework's own execution* into the run log, early in the
 run (rules §5.5). A wrapper printing it on the framework's behalf is judged
-non-native.
+non-native. Self-check with `bash scripts/check_native_marker.sh logs/e2e.log`.
 
 **Q: What counts as the 2–4 experiments?**
 Experiments are counted as *strategy lines*: a materially different

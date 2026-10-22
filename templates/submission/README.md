@@ -8,13 +8,18 @@ PROVENANCE.json       # edit from PROVENANCE.json.template
 workspace/
   research_idea.json    # written and locked BEFORE the first experiment
   experiment_trace.json # every experiment and its results
+  environment.json      # run env — six required fields (see template)
   final_report.md       # framework-authored
   <topic payload>       # predictions.csv | predictions.jsonl | estimator.py
 logs/
   e2e.log               # raw stdout/stderr of the run (required)
-prompt.txt              # the exact task input given to the framework
+prompt.txt              # the exact task input the runner mounted (input/prompt.txt)
 source/                 # optional: research code the framework generated
 ```
+
+A complete worked example (audit-passing) lives in
+`golden_tdc_admet_tox/`; `environment.json.template` mirrors its
+environment record.
 
 Validation rules (rules §5, §8, contracts/):
 

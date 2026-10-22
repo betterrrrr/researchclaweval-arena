@@ -89,8 +89,10 @@ Operational rules:
   frameworks. Either a fixed stage contract is issued by the organizer, or
   `CC` is demoted to a display-only column.
 - **Submitted-evidence caveat:** when *participants* run the harness
-  themselves and submit artifacts (as in this competition), the log is no
-  longer host-captured. ER/SC/CC then measure the *quality of the submitted
+  themselves and submit artifacts (as in this competition), the log is the
+  runner wrapper's live-tee of the framework's own stdout/stderr, submitted
+  alongside the artifacts — faithful, but written by participant-owned code,
+  not by the host. ER/SC/CC then measure the *quality of the submitted
   evidence*, not the execution itself. The community leaderboard's judge
   runs are host-captured again; this caveat applies only to fan-made
   submissions and should be stated whenever such numbers are cited.

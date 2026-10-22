@@ -64,7 +64,9 @@ Read these three:
   ```
 - `contracts/tdc_admet_tox_contract.md` — macro average of AMES / hERG / DILI
   AUROC. Read §5.6 of the rules about `sample_id` **before** writing code
-  (`hERG` endpoint → `HERG_` id prefix).
+  (`hERG` endpoint → `HERG_` id prefix). Self-check once a day with
+  `bash scripts/selfcheck_tdc.sh` (audits the golden run, then the optional
+  reference-baseline round trip when `TDC_ADMET_TOX_DATASET_ROOT` is set).
 
 All contracts share the same spine:
 
@@ -105,7 +107,9 @@ or a model id in your code either way.
 **Native execution marker.** Your framework must print
 `FRAMEWORK_NATIVE_LOG_MARKER` from inside its own execution, as early as
 possible. A run that exits 0 without this marker in `logs/e2e.log` is judged
-non-native and does not score.
+non-native and does not score. Self-check with
+`bash scripts/check_native_marker.sh logs/e2e.log` (pass the run root, or
+your custom marker as a second argument).
 
 ## 4. Prompt.txt
 
@@ -132,6 +136,7 @@ Per topic, one artifact set:
 ├── workspace/
 │   ├── research_idea.json
 │   ├── experiment_trace.json
+│   ├── environment.json     # run env — six required fields, see below
 │   ├── final_report.md
 │   └── <topic payload>      # predictions.csv | predictions.jsonl | estimator.py
 ├── logs/e2e.log             # raw stdout/stderr of the run
@@ -146,6 +151,12 @@ Payload formats (rules §5.3):
 | `tdc_admet_tox` | `predictions.csv` | `sample_id,endpoint,probability` |
 | `psydefdetect` | `predictions.jsonl` | one `{"id":…,"predicted_label":…}` per line |
 | `arc_wbe_2026` | `estimator.py` | `predict(mlp)` returning a `(32,256)` array |
+
+`environment.json` records the run environment — the audit checks six fields
+(`python_version`, `platform`, `device`, `seeds`, `packages`, `created_at`);
+the trace's `reproduction` block declares the exact entrypoint, command, and
+seed that rerun the promoted experiment. Start from
+`templates/submission/environment.json.template`.
 
 `dataset_sha256` and `split_sha256` must match the published values byte for
 byte; a mismatch is rejected without scoring. `logs/e2e.log` is the primary
