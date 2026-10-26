@@ -2,16 +2,17 @@
 
 ## The competition
 
-**Q: Are the tasks hidden?**
-No. All three tasks are public benchmarks, fully disclosed. You may iterate
-as many times as you like before submitting; there is no hidden set and no
-secret split. That is deliberate — see `docs/rules.md` §0 and §2.
+**Q: Are the three public topics used for final scoring?**
+No. They are for participant self-testing, and you can run and debug them
+as often as needed. Final scoring uses other topics, run and scored by the
+organizer. Self-test scores do not count toward final rankings. See
+`docs/rules.md` §0 and §2.
 
 **Q: Is the leaderboard a single merged score?**
-No. The main board is three columns, one ranking per task. The three metrics
-(0.5–1.0 AUROC, ~0.1–0.3 macro-F1, arc across orders of magnitude) cannot be
-merged without calibration artifacts dominating the result — see the
-"Ranking" section of `docs/rules.md` (§6.3) and `docs/announcement.md` §6.3.
+No. Official evaluation has a separate ranking for each topic. Different
+task metrics are not added together, and there is no overall champion.
+Public self-test scores do not enter the final rankings. See `docs/rules.md`
+§6.3 and `docs/announcement.md` §6.2.
 
 **Q: Who provides the model?**
 Two stages. Self-testing (before submission): you bring your own model —

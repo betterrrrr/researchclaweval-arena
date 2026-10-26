@@ -2,8 +2,10 @@
 
 This directory is empty **until the submission window closes**.
 
-The competition leaderboard is three columns of official objective scores,
-published by the organizer after scoring. Publishing policy:
+The competition leaderboard contains official objective scores from the
+organizer's evaluation on topics other than the three public self-test topics,
+with a separate ranking per evaluation topic. Self-test scores do not count
+toward final rankings. Publishing policy:
 
 - Only host-scored official values enter the board (no self-reported numbers).
 - Every number passes the contamination discipline (placeholder values /

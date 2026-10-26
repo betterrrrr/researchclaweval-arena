@@ -3,6 +3,10 @@
 > If the docs disagree with the rules (`docs/rules.md`), the rules win.
 > If the rules disagree with a contract (`contracts/*.md`), the contract wins.
 
+This guide uses the three public topics for integration and self-testing.
+**Final scoring uses other topics, run and scored by the organizer.
+Scores on these self-test topics do not count toward final rankings.**
+
 ## 0. What you will do
 
 1. Register and receive a framework id (a two-digit number).
@@ -10,7 +14,8 @@
 3. Read the three contracts.
 4. Write exactly one adapter: how to *launch* your framework.
 5. Run through the official runner template.
-6. Submit: open-source framework repo + one artifact set per topic.
+6. Submit the open-source framework repo and run artifacts as required by the
+   rules; the organizer evaluates the framework on other topics.
 
 Your framework must own **planning, experiment design, execution, comparison,
 selection, and final delivery** — the adapter contains no evaluation logic.

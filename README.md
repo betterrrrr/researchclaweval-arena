@@ -1,10 +1,14 @@
 # ResearchClawEval Arena
 
-> Run YOUR research-agent framework on three real scientific tasks. One set of
-> contracts, one set of official scorers, one frozen data split — the only
-> variable left is your framework.
+Submit your research-agent framework for the organizer to run and score.
+The framework should plan the research, write code, run and compare experiments,
+and produce a final report.
 
-**Registration open · 1-month competition · Evaluation protocol fully public**
+**The three topics in this repository are for participant self-testing.
+Final scoring will use other topics. Self-test scores do not count toward
+final rankings.**
+
+Registration open · 1-month competition
 
 [中文说明](README.zh-CN.md) · [比赛公告](docs/announcement.md) · [Rules](docs/rules.md)
 
@@ -12,10 +16,11 @@
 
 ## What this is
 
-ResearchClawEval Arena is a scoring event for research-agent frameworks
-(agents that plan, write code, run experiments, compare, select, and write up —
-end to end on their own). The organizer fixes everything that can be fixed and
-scores everyone with the same official scorer on the same data:
+ResearchClawEval Arena is a competition for research-agent frameworks.
+Use the public self-test topics to develop your adapter and check the full
+workflow. After submission, the organizer runs your framework on other topics
+and calculates the final scores. All participants in official evaluation use
+the same task requirements, model, data splits, and budgets:
 
 | Fixed | How |
 |---|---|
@@ -26,14 +31,16 @@ scores everyone with the same official scorer on the same data:
 | Experiment count | 2–4 (strategy lines — rules §5.8), written into each contract |
 | Runtime | a unified runner template with container isolation |
 
-**The only remaining variable is your framework.** Everything is public:
-contracts, dataset download with sha256 verification, scorer glue, submission
-spec. You can iterate as many times as you like before submitting — that is
-by design, not a loophole.
+The self-test contracts, dataset download scripts, scoring tools, and
+submission formats are public. You can repeat self-tests as often as needed
+before submitting. Official evaluation uses other topics.
 
 ---
 
-## The three tasks
+## Three self-test tasks
+
+These topics help you test your integration. They are not the topics used
+for final scoring.
 
 | Task | Goal | Official metric | Data |
 |---|---|---|---|
@@ -41,21 +48,16 @@ by design, not a loophole.
 | [PsyDefDetect](contracts/psydefdetect_contract.md) | Detect psychological defense mechanisms in supportive conversations | macro-F1 ↑ | 5.4 MB |
 | [ARC-WBE-2026](contracts/arc_wbe_2026_contract.md) | Estimate per-layer activations from a Transformer's weight matrices | adjusted final-layer score ↓ | 907 MB |
 
-Three different domains — tabular/molecular, text classification, and
-numerical estimation. A framework that only shines in one of them will show
-it.
-
-**The leaderboard is three columns, one per task, ranked separately.** The
-metrics have incomparable scales (AUROC 0.5–1.0, macro-F1 ~0.1–0.3, arc spans
-orders of magnitude); there is no "overall champion" because a merged score
-would be dominated by calibration artifacts, not framework quality.
+Final rankings use the organizer's scores on other topics, with a separate
+ranking for each evaluation topic. Scores from different metrics are not
+added together, and there is no overall champion.
 
 ---
 
 ## Quick start
 
 ```bash
-# 1. Get the datasets (downloaded by you, verified against published sha256)
+# 1. Get the self-test datasets (verified against published sha256)
 bash scripts/setup_datasets.sh --dataset tdc_admet_tox
 bash scripts/setup_datasets.sh --dataset psydefdetect
 bash scripts/setup_datasets.sh --dataset arc_wbe_2026
@@ -77,7 +79,7 @@ Full walkthrough: [`docs/participant_quickstart.md`](docs/participant_quickstart
 ## Repository layout
 
 ```
-contracts/          Task contracts + execution budgets + submission specs
+contracts/          Self-test task contracts + execution budgets + submission specs
 scoring/            Official-scorer glue and data preparation scripts
 scripts/            setup_datasets.sh · runner templates · release self-check
 judge/              (long-term community leaderboard, see docs/metric-system.md)
@@ -89,8 +91,9 @@ results/            Result tables (published after the submission window)
 
 ## Why no result tables yet
 
-This repository publishes the *protocol* — contracts, data setup, scorers,
-admission templates. Score tables will be posted after the submission window.
+This repository provides materials for self-testing and integration.
+Final score tables will be posted after the submission window and official
+evaluation on other topics.
 We do not redistribute any dataset; competitors download and verify the data
 themselves.
 
