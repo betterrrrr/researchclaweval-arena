@@ -1,101 +1,100 @@
-# Scorer Contracts
+# Scoring Interfaces and Contracts
 
-How the official scores for the three topics are computed and what the
-scripts in `scoring/` do. All scripts are glue around the official scorers —
-the scoring code is not vendored here; install the official packages as
-described below, and run the glue.
+This document describes scoring and validation for the three public
+self-test topics. Final competition evaluation uses other topics and their
+corresponding scoring contracts.
+
+`scoring/` contains the TDC and PsyDefDetect scoring implementations, artifact
+validators, data preparation scripts, and adapters for the external ARC
+toolkit. The ARC toolkit itself is not included in this repository.
 
 ## Installation
 
-The glue in `scoring/` is standard-library-only. Only the ARC tooling
-imports third-party packages, lazily (`whestbench`, `datasets`, `pyarrow`);
-install them from `scoring/requirements.txt` when you run ARC glue:
+TDC and PsyDefDetect scoring and artifact validation use the Python standard
+library. ARC tools also require `whestbench`, `datasets`, and `pyarrow` from
+`scoring/requirements.txt`. Install ARC dependencies in a dedicated environment:
 
 ```bash
-pip install -r scoring/requirements.txt   # optional — ARC tooling only
+uv venv
+uv pip install -r scoring/requirements.txt
 ```
 
-Pin exact versions for the release bundle per the official toolkit pages
-(see the ARC section below). The TDC/psydef scorers and the artifact
-validator never import third-party code.
+Release bundles should pin the ARC toolkit versions used for evaluation.
+The dependency file currently lists packages without version pins.
 
-## CLI conventions
+## Command-line interfaces
 
-Every scoring/validation entry point follows one contract so scripts and CI
-can compose them. Three rules: arguments via `argparse`; one JSON payload on
-stdout; exit `0` on success and `1` on failure (usage errors exit `2`).
+Python entry points use `argparse`. Successful commands exit 0; validation
+or scoring failures generally exit 1, and argument errors exit 2. Output
+formats differ by entry point as specified below.
 
-| entry point | args | success | failure |
+| Entry point | Arguments | Success | Failure |
 |---|---|---|---|
-| `validate_tdc_admet_tox_run.py` | `--run-root` `--stage` [`--public-dataset-root`] | audit payload JSON on stdout, exit 0 | `{"status":"failed","error":…}` JSON on stdout, exit 1 |
-| `run_tdc_admet_tox_validation_score.py` | `--validation` `--predictions` `--output-metrics` | metrics payload JSON on stdout, exit 0 | plain-text error, exit 1 |
-| `run_tdc_admet_tox_host_score.py` | `--public-dataset-root` `--hidden-labels` `--predictions` `--output-score` | score payload JSON on stdout, exit 0 | plain-text error, exit 1 |
-| `scripts/check-release.sh` | `--path DIR` | `check-release.sh: PASS` on stdout, exit 0 | `FINDING: …` lines on stderr, exit 1 (usage errors also exit 1) |
+| `validate_tdc_admet_tox_run.py` | `--run-root` `--stage` [`--public-dataset-root`] | Audit JSON on stdout, exit 0 | `{"status":"failed","error":…}` JSON on stdout, exit 1 |
+| `run_tdc_admet_tox_validation_score.py` | `--validation` `--predictions` `--output-metrics` | Metrics JSON on stdout and in the output file, exit 0 | Plain-text error, exit 1 |
+| `run_tdc_admet_tox_host_score.py` | `--public-dataset-root` `--hidden-labels` `--predictions` `--output-score` | Score JSON in the output file; no success JSON on stdout, exit 0 | Plain-text error, exit 1 |
+| `scripts/check-release.sh` | `--path DIR` | `check-release.sh: PASS` on stdout, exit 0 | `FINDING: …` on stderr, exit 1; usage errors also exit 1 |
 | `scripts/check_native_marker.sh` | `<log-or-run-root>` `[MARKER]` | `PASS:` on stdout, exit 0 | `FAIL:` on stderr, exit 1 |
-| `scripts/validate_schemas.py` | `--manifest|--provenance|--trace FILE`, `--all-repo` | `{"status":"passed",…}` JSON, exit 0 | `{"status":"failed","errors":…}` JSON, exit 1 |
-| `scripts/selfcheck_tdc.sh` | none | `[selfcheck] TDC-ADMET-Tox selfcheck: PASS`, exit 0 | first failing step, exit non-zero |
+| `scripts/validate_schemas.py` | `--manifest FILE`, `--provenance FILE`, `--trace FILE`, `--environment FILE`, or `--all-repo` | `{"status":"passed",…}` JSON, exit 0 | `{"status":"failed","errors":…}` JSON, exit 1 |
+| `scripts/selfcheck_tdc.sh` | None | `[selfcheck] TDC-ADMET-Tox selfcheck: PASS`, exit 0 | Stops at the first failed step with a nonzero exit status |
 
-`--output-metrics` (validation scorer) and `--output-score` (host scorer)
-are intentionally different flags: the first emits a metrics payload, the
-second a scored payload; both are JSON. Python entry points print JSON;
-bash scripts stay shell-native and only their exit codes (0 / 1 / 2) are
-part of the contract.
+The validation scorer's `--output-metrics` writes validation metrics. The
+host scorer's `--output-score` writes the official score. Both files are
+JSON, but their purposes and payloads differ. Shell entry points use text
+output; callers should check their exit status.
 
-## TDC-ADMET-Tox — `macro_average_auroc`
+## TDC-ADMET-Tox: `macro_average_auroc`
 
-Three endpoints (AMES / hERG / DILI); the main score is the unweighted mean
-of the three endpoint AUROCs. AUPRC, calibration, runtime, reproducibility
-are secondary diagnostics and never enter the score.
+The main score is the equal-weight mean AUROC for AMES, hERG, and DILI.
+AUPRC, calibration, runtime, and reproducibility are secondary diagnostics
+and do not enter the main score.
 
-| script | role |
+| Script | Role |
 |---|---|
-| `run_tdc_admet_tox_host_score.py` | **host-side official scorer.** Needs the hidden test labels (`TDC_ADMET_TOX_HIDDEN_LABELS_ROOT`); never mounted into framework containers. Writes `score.json` after the framework exits. |
-| `validate_tdc_admet_tox_run.py` | artifact validator, `--stage framework` (before scoring) and `--stage final` (after). Rejects, among other things, framework outputs carrying other-topic markers or hidden-label references. |
-| `run_tdc_admet_tox_reference_baseline.py` | builds and scores a reference baseline run (`reproduce.py` reproduces it) — the reference implementation teams can start from. |
-| `export_tdc_admet_tox_official_splits.py` | (re)exports the frozen endpoint splits from the archive. |
-| `prepare_tdc_admet_tox_from_archive.py` | materializes `public/{train,validation,test}.csv` from `admet_group.zip`; used by `scripts/setup_datasets.sh`. |
-| `scripts/selfcheck_tdc.sh` | one-command TDC self-check: audits the golden run, then — when `TDC_ADMET_TOX_DATASET_ROOT` is set — runs the reference baseline and audits its output with the same validator. |
+| `run_tdc_admet_tox_host_score.py` | Organizer-side scorer using hidden test labels (`TDC_ADMET_TOX_HIDDEN_LABELS_ROOT`). Labels are not mounted into framework containers. Writes `score.json` after the framework exits. |
+| `validate_tdc_admet_tox_run.py` | Artifact validation at `--stage framework` before scoring and `--stage final` after scoring. Rejects other-topic markers and hidden-label references in framework artifacts. |
+| `run_tdc_admet_tox_reference_baseline.py` | Builds and scores a reference baseline with a `reproduce.py` entry point. |
+| `export_tdc_admet_tox_official_splits.py` | Exports the fixed endpoint splits from the source archive. |
+| `prepare_tdc_admet_tox_from_archive.py` | Creates `public/{train,validation,test}.csv` from `admet_group.zip`, as used by `scripts/setup_datasets.sh`. |
+| `scripts/selfcheck_tdc.sh` | Validates the golden run and, when `TDC_ADMET_TOX_DATASET_ROOT` is set, runs and validates the reference baseline. |
 
-**Dataset licensing:** TDC-ADMET-Tox data comes from Harvard Dataverse
-(`doi:10.7910/DVN/21LKWG`), used under Dataverse terms; see
-`docs/rules.md` §3.1 for the sha256 you must match after downloading.
+Data originates from Harvard Dataverse `doi:10.7910/DVN/21LKWG` under its
+applicable terms. Download checksums are listed in `docs/rules.md` §3.2.
 
-## PsyDefDetect — macro-F1 over positive classes 1–8
+## PsyDefDetect: macro-F1 over positive classes 1–8
 
-Class `0` (No Defense) is excluded from the official macro-F1.
+The official macro-F1 excludes class `0` (No Defense).
 
-| script | role |
+| Script | Role |
 |---|---|
-| `run_psydefdetect_local_score.py` | the local scorer on the standardized split; framework can run it for self-evaluation. Reads `PSYDEFDETECT_DATASET_ROOT` and the frozen canonical split (split sha256 published in `docs/rules.md` §3.3). |
+| `run_psydefdetect_local_score.py` | Local self-evaluation on the standardized split. Uses `PSYDEFDETECT_DATASET_ROOT` and the fixed canonical split; checksum in `docs/rules.md` §3.3. |
 
-**Data licensing:** `PsyDefConv` is `cc-by-nc-4.0`; the competition is
-**non-commercial** — verify your own use complies before downloading.
+PsyDefConv uses `cc-by-nc-4.0`. The competition is non-commercial, and data
+use must comply with that license.
 
-## ARC-WBE-2026 — `adjusted_final_layer_score` (lower is better)
+## ARC-WBE-2026: `adjusted_final_layer_score`
 
-ARC differs from the other two topics: the official metric compares against
-true activations, which are host-only. Frameworks receive a **visible
-validation set** (10 MLPs with ground truth, disjoint from the 90-MLP scoring
-set) for self-evaluation; the host scores the rest.
+Lower scores are better. The metric compares estimated and true activations.
+Frameworks receive a visible validation set of 10 MLPs with ground truth;
+the disjoint 90-MLP scoring set is evaluated by the organizer.
 
-| script | role |
+| Script | Role |
 |---|---|
-| `run_arc_wbe_2026_local_score.py` | local scorer over the visible validation set (framework-side self-evaluation). |
-| `arc_wbe_2026_official_adapter.py` | scans the framework's `estimator.py`, verifies it satisfies the load contract (`predict(mlp)` returning `(32,256)`; no constants, scalars, or placeholder logic), and renders the official adapter the host feeds to the official scorer. It fails closed on missing/malformed/non-finite/shape-mismatched predictions. Accepts a `framework_hint` — a two-digit framework id — for estimator-shape routing. |
-| `bake_arc_wbe_2026_dataset_with_whestbench.py` | bakes the dataset format required by the official scorer (whest). |
-| `prepare_arc_wbe_2026_dataset.py` | downloads + prepares the dataset (called by `setup_datasets.sh`). |
-| `make_arc_wbe_2026_visible_validation.py` | splits the dataset into visible-validation (10 MLPs) and scoring (90 MLPs) sets, writing `split_manifest.json` with per-set sha256. |
+| `run_arc_wbe_2026_local_score.py` | Local evaluation on the visible validation set. |
+| `arc_wbe_2026_official_adapter.py` | Checks the estimator load contract and renders an adapter for the official scorer. `predict(mlp)` returns `(32,256)` predictions. Missing, malformed, non-finite, wrong-shape, constant, scalar, and placeholder outputs are rejected. Optional two-digit `framework_hint` selects estimator-shape routing. |
+| `bake_arc_wbe_2026_dataset_with_whestbench.py` | Prepares the dataset format used by the official toolkit. |
+| `prepare_arc_wbe_2026_dataset.py` | Downloads and prepares ARC data for `setup_datasets.sh`. |
+| `make_arc_wbe_2026_visible_validation.py` | Creates disjoint 10-MLP validation and 90-MLP scoring sets and writes `split_manifest.json` with per-set checksums. |
 
-**Official scorer installation:** the official ARC estimator benchmark is
-`whestbench` (ARC White-Box Estimation toolkit); install the official package
-and dataset per its own documentation (`https://huggingface.co/datasets/aicrowd/arc-whestbench-public-2026`).
-We provide glue, not the vendored toolkit; verify the toolkit's license on
-its own page.
+Install the official `whestbench` toolkit and data using the
+[ARC dataset documentation](https://huggingface.co/datasets/aicrowd/arc-whestbench-public-2026).
+The external toolkit's license applies separately.
 
-## Common invariants
+## Shared requirements
 
-- Only `score.json` written by the host-side scorer counts. A framework must
-  never create, backfill, or edit `score.json`.
-- `dataset_sha256` / `split_sha256` mismatches are rejected without scoring.
-- Framework containers never see hidden labels, and the repository root is
-  never mounted as a writable framework workspace.
+- Formal score files are produced by the organizer-side scorer. Frameworks
+  must not create or modify the official `score.json`. Local self-evaluation
+  outputs are separate from formal score records.
+- Dataset and split checksums must match the published values.
+- Framework containers must not receive hidden labels. The repository root
+  must not serve as a writable framework workspace.

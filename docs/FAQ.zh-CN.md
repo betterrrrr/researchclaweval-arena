@@ -1,91 +1,95 @@
-# FAQ(中文)
+# 常见问题
 
-> 本文是英文版 [`FAQ.md`](FAQ.md) 的配套翻译。若与中文规则(`docs/rules.md`)冲突,以规则为准;英文版与中文版同为正式口径。
+[English](FAQ.md)。本页为参赛与自测说明，规则以 `docs/rules.md` 为准。
 
 ## 比赛
 
-**问:公开的三个 topic 就是最终评分题目吗?**
+**公开的三个任务是否用于最终评分？**
 
-不是。这三个 topic 供参赛者自测，可以反复运行和调试。最终评分会使用其他 topic，由主办方统一运行框架并评分；自测成绩不计入最终排名。见 `docs/rules.md` §0 与 §2。
+三个公开任务仅供开发与自测，可重复运行和调试。正式测评采用其他任务，由主办方统一运行和评分；自测成绩不计入最终排名。见规则 §0、§2。
 
-**问:榜单是合并总分吗?**
+**总分与冠军如何确定？**
 
-是。各正式 topic 的成绩按赛前固定的参考值归一化到 0–100 分，再等权平均。总分最高者为总分冠军；总分相同时比较单项第一数量，仍相同则并列。单项排名也会保留。公开自测成绩不参与计算。公式和计分精度见 `docs/rules.md` §6.3。
+各正式任务按测评前固定的参考值归一化至 0–100 分，再等权平均。总分最高者获得总分冠军；总分相同时，单项第一数量较多者优先，仍相同则并列。单项排名同时公布。计算公式与精度见规则 §6.3。
 
-**问:任务失败或缺少结果怎么办?**
+**失败或缺少有效结果的任务如何处理？**
 
-该 topic 对总分贡献为 0 分，仍计入固定的 topic 总数，不能只平均成功任务。原始分保留为 `null` 并标明状态。至少有一个有效正式测评结果才能进入总榜；取消资格的框架不参与评奖。
+该任务对总分贡献为 0，仍计入固定任务总数。原始分记为 `null` 并保留状态，不得仅对成功任务计算平均分。至少有一个有效正式测评结果方可进入总榜；取消资格的框架不参与评奖。
 
-**问:模型由谁提供?**
+**模型由谁提供？**
 
-分两阶段。**自测阶段**(提交前):用你自己的模型——主办方不限制(主办方推荐的自测模型在规则 §4 点名)。**正式测评**(提交后评分):主办方经 `OPENAI_BASE_URL` / `OPENAI_API_KEY` / `OPENAI_MODEL` 统一注入;该阶段自带模型或自带 endpoint 即不受理。这是**框架**竞赛,不是模型竞赛(规则 §4)。
+自测阶段由参赛者提供，推荐模型见规则 §4，不作强制限制。正式测评由主办方通过 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` 统一注入，不允许另行指定模型或 endpoint。两阶段均不得在代码中硬编码模型 ID 或地址。
 
-**问:为什么榜上不用判官/LLM 评分?**
+**LLM 评审是否参与比赛排名？**
 
-比赛榜只用客观官方分。七维 LLM 判官与 ED 属于长期社区榜:它们有噪声、有成本,而且在"提交产物"的交付模式下测的是证据质量而非执行本身(规则 §6.2 与附录 A)。
+比赛仅依据正式任务的客观评分。七维 LLM 评审与 ED 属于社区榜，受调用成本、评分波动及证据来源限制，不参与比赛排名。见规则 §6.2 和附录 A。
 
 ## 数据
 
-**问:数据从哪来?**
+**如何获取数据？**
 
-自己下载、自己校验 sha256——`scripts/setup_datasets.sh`。主办方不重新分发数据集(规则 §3.2)。若 `huggingface.co` 不可达,设 `HF_ENDPOINT=https://hf-mirror.com`。
+运行 `scripts/setup_datasets.sh` 从原始发布处下载并校验 SHA-256。主办方不重新分发数据。无法直接访问 `huggingface.co` 时，可设置 `HF_ENDPOINT=https://hf-mirror.com`。见规则 §3.2。
 
-**问:PsyDefDetect 真的能用吗?**
+**PsyDefDetect 的许可要求是什么？**
 
-能,授权为 `cc-by-nc-4.0`。本竞赛按**非商业用途**举办;下载前请确认你自己的用途合规。
+数据采用 `cc-by-nc-4.0`。本竞赛按非商业用途举办，参赛者的数据使用须符合该许可。
 
-**问:必须用哪个切分?**
+**应使用哪份数据切分？**
 
-冻结的 canonical 切分。`split_sha256` 必须逐字节匹配;任何重新划分都不受理。PsyDefDetect 的 canonical 切分是对话级、无泄漏的切分,与数据集自带的记录级官方切分不同(规则 §3.3)。
+使用固定的 canonical 切分，`split_sha256` 须与公布值完全一致。PsyDefDetect 使用对话级切分，与数据集自带的记录级切分不同。见规则 §3.3。
 
-## 评分
+## 评分与验证
 
-**问:我的 TDC 分数恰好是 0。**
+**TDC 预测因样本标识不匹配被拒绝，应如何处理？**
 
-检查 `predictions.csv` 的 `sample_id` 是否逐字取自 `public/test.csv`——永远不要自己拼(`hERG` endpoint 对应 `HERG_` 前缀)。一个 id 对不上 → 全部匹配失败、分数为 0(规则 §5.6)。
+直接使用 `public/test.csv` 中的 `sample_id`，不得自行重建。`hERG` 对应 ID 前缀为 `HERG_`。预测记录的 ID 与 endpoint 集合必须与测试文件一致，否则校验或评分程序会拒绝该结果。此类错误不产生有效的原始 0 分。见规则 §5.6。
 
-**问:我的 ARC 估计器被拒了。**
+**ARC 估计器的输出要求是什么？**
 
-官方适配器 fail-closed:`predict(self, mlp)` 必须返回真实的 `(32, 256)` 浮点数组。常量、广播、标量、全零、占位符或粘贴的日志输出都不受理(ARC 契约 "Required Outputs")。也检查签名——有些估计器省略 `budget` 参数;适配器会探测签名,两种都支持。
+`predict(mlp)` 须返回符合契约的 `(32, 256)` 数值数组。适配器支持带或不带 `budget` 参数的实现，并拒绝错误形状、非有限值、常量、全零、广播、标量及占位符结果。详见 ARC 契约的 Required Outputs。
 
-**问:为什么我的 ARC run 没有 `b0`/`bT`?**
+**ARC 的 `b0`、`bT` 缺失时应检查哪些记录？**
 
-ARC 是唯一不给框架真值的 topic。需要 `experiment_trace.json` 里有数字化的 `framework_visible_validation` 自评记录才能算(规则 §3.4);没有的话扩展维度退回到判官的序数路径。
+检查 `experiment_trace.json` 中是否包含数值化的 `framework_visible_validation` 自评记录。ARC 为可见验证集提供真值，评分集真值仅供主办方使用。缺少数值记录时，无法据此计算 `b0`、`bT`，扩展评测使用评审工具的序数路径。见规则 §3.4。
 
-**问:我的 run 退出码 0 却没分。**
+**退出码为 0 是否代表运行有效？**
 
-多半是缺原生标记:`FRAMEWORK_NATIVE_LOG_MARKER` 必须由**框架自己的执行**打印进运行日志,且在运行**尽量靠前**的位置(规则 §5.5)。由 wrapper 代打会被判非原生。自测:`bash scripts/check_native_marker.sh logs/e2e.log`。
+退出码不替代产物与原生执行校验。`FRAMEWORK_NATIVE_LOG_MARKER` 须由框架自身在运行早期输出至日志，外层 wrapper 不得代为输出。检查命令：`bash scripts/check_native_marker.sh logs/e2e.log`。见规则 §5.5。
 
-**问:2–4 次实验怎么计数?**
+**2–4 次实验如何计数？**
 
-实验按**策略线**计:一套实质性不同的配置簇(在算法族 / 特征 / 架构 / 超参搜索空间整体设计上有别)。一条线内的重试、仅换种子、小调参不算;失败的 setup 尝试永远不算;已评估后崩溃或超时的配置按其所属策略线计为一个完整配置(规则 §5.8 与各契约的执行预算)。
+按策略线计数：算法族、特征表示、模型架构或超参数搜索空间的整体设定须存在实质性区别。同一策略线内的重试、仅换种子和小幅调参不增加计数；未完成训练或评估的配置尝试仅记入日志。已完成评估后崩溃或超时的配置仍归入所属策略线。见规则 §5.8。
 
-**问:可以提交自算分数吗?**
+**是否接受参赛者自行计算的成绩？**
 
-不行。自报分数永不入榜——占位符分数、自实现指标、错误切分都是不受理事由(规则 §6.1、§8)。
+自评分仅用于开发与调试，不作为入榜成绩。正式成绩由主办方按官方指标与固定切分计算。见规则 §6.1、§8。
 
-## 工具
+## 工具与运行
 
-**问:有参赛用下载包吗?**
+**是否提供发布包？**
 
-有——GitHub Releases 发布 `researchclaweval-arena-<version>.zip` / `.tar.gz`(打标树的精确副本,release 说明里有校验 sha256)。解压到任意位置,跑 `bash scripts/setup_datasets.sh`,按 `docs/participant_quickstart.md` 走。数据从不打包——自己下载、自己校验。
+GitHub Releases 提供 `researchclaweval-arena-<version>.zip` 和 `.tar.gz`，内容对应发布标签，校验值见发布说明。解压后按 `docs/participant_quickstart.zh-CN.md` 配置环境。数据集不包含在发布包中，须通过下载脚本另行获取。
 
-**问:runner 是什么?**
+**Runner 的职责是什么？**
 
-`scripts/runner/` 下的模板包装:只读挂载契约与数据集、注入模型环境、导出 `WORKSPACE` / `DATASET_ROOT`、在 `input/prompt.txt` 合成任务输入(契约 + 执行预算 + 任务摘要;规则 §5.7)、在新 workspace 里原生运行你的框架、收集 `logs/e2e.log` 与产物。必须用它而不是自己写临时编排,这样产物才可归因(规则 §5.4)。
+`scripts/runner/` 中的模板负责只读挂载契约和数据、注入模型环境变量、导出 `WORKSPACE` 与 `DATASET_ROOT`、生成 `input/prompt.txt`、在独立工作目录中启动框架，并收集 `logs/e2e.log` 和运行产物。运行须使用官方模板。见规则 §5.4、§5.7。
 
-**问:adapter 的 manifest 里填什么?**
+**适配器 manifest 需要哪些内容？**
 
-`templates/example-adapter/manifest.json`——对照 `schemas/adapter.schema.json` 校验(framework id、名称、上游仓库、许可、原生入口、必需环境变量/镜像、补丁)。把每个 TODO 都填了,那就是全部接入面。本地自测:`python3 scripts/validate_schemas.py --manifest <你的 manifest.json>`。
+`templates/example-adapter/manifest.json` 声明框架 ID、名称、上游仓库、许可、原生入口、必需环境变量、镜像和补丁。完成占位内容后，使用 `python3 scripts/validate_schemas.py --manifest <manifest-path>` 对照 `schemas/adapter.schema.json` 校验。
 
-**问:运行中网关抖动会怎样?**
+**`resource_budget` 应如何填写？**
 
-契约里的墙钟预算照常走表——网关抖动**不是豁免理由**。自测建议:先用一个小实验验证链路,定期 checkpoint 并从断点续跑,重试/退避在你自己客户端侧配置(注入的 relay 没有官方旋钮;社区榜判官侧自带重试,规则 §5.4)。
+使用契约规定的完整预算对象。TDC 的定义与示例见 `contracts/tdc_admet_tox_compute_budget.md`，机器可读值见 `scoring/resource_budget.anchors.json`；其中包括 `network_policy: "injected_llm_relay_only"`。校验要求完整匹配，不应从错误消息推断配置。
 
-**问:判官管线需要我的 key 吗?**
+**网络中断是否暂停预算计时？**
 
-判官跑在主办方侧。代码从环境变量读 `JUDGE_API_KEY` / `JUDGE_MODEL` / `JUDGE_BASE_URL`;源码里没有密钥、没有默认模型 id。
+不暂停任务契约规定的墙钟计时，也不补时。建议自测前验证连接，定期保存检查点，并在框架客户端配置重试、退避与恢复。注入的 relay 不提供统一重试配置，社区榜评审工具另有重试机制。见规则 §5.4。
 
-**问:发现评分器胶水脚本的 bug?**
+**评审工具的凭据由谁配置？**
 
-开 issue,附 topic、脚本名与最小复现。不要用邮件发原始数据集或任何密钥给任何人。
+评审工具由主办方运行，通过 `JUDGE_API_KEY`、`JUDGE_MODEL`、`JUDGE_BASE_URL` 读取配置。源码不包含凭据或默认模型 ID。
+
+**如何报告评分工具问题？**
+
+提交 issue，注明任务、脚本名称和最小复现步骤。复现材料不得包含原始数据集或密钥。
