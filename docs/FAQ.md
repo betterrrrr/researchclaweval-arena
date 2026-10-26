@@ -2,16 +2,25 @@
 
 ## The competition
 
-**Q: Are the tasks hidden?**
-No. All three tasks are public benchmarks, fully disclosed. You may iterate
-as many times as you like before submitting; there is no hidden set and no
-secret split. That is deliberate — see `docs/rules.md` §0 and §2.
+**Q: Are the three public topics used for final scoring?**
+No. They are for participant self-testing, and you can run and debug them
+as often as needed. Final scoring uses other topics, run and scored by the
+organizer. Self-test scores do not count toward final rankings. See
+`docs/rules.md` §0 and §2.
 
 **Q: Is the leaderboard a single merged score?**
-No. The main board is three columns, one ranking per task. The three metrics
-(0.5–1.0 AUROC, ~0.1–0.3 macro-F1, arc across orders of magnitude) cannot be
-merged without calibration artifacts dominating the result — see the
-"Ranking" section of `docs/rules.md` (§6.3) and `docs/announcement.md` §6.3.
+Yes. Normalize each official topic score to 0–100 using reference values
+fixed before evaluation, then take the equal-weight mean. The highest total
+wins the overall championship. Tied totals are resolved by the number of
+topic first places; if that also ties, the rank is shared. Per-topic rankings
+are also published. Public self-test scores do not count. See `docs/rules.md`
+§6.3 for the formula and comparison precision.
+
+**Q: What happens if a topic fails or has no valid result?**
+Its contribution to the total is 0, and it stays in the fixed topic count.
+Do not average only successful topics. Record the raw score as `null` and
+retain the outcome status. At least one valid official topic result is
+required to enter the overall board; disqualified frameworks are excluded.
 
 **Q: Who provides the model?**
 Two stages. Self-testing (before submission): you bring your own model —

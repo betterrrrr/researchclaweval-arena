@@ -3,7 +3,16 @@
 The competition leaderboard uses **objective official scores only** (see
 `docs/rules.md` §6). This document describes the extended 12-dimension metric
 system used by the long-term community leaderboard that runs after the
-competition on the same harness, the same topics, and the same frozen splits.
+competition using the same harness. Community topics and splits are specified
+separately; the three public self-test topics are not the final competition
+evaluation topics.
+
+The competition's overall champion uses an equal-weight mean of normalized
+0–100 official topic scores; tied totals are resolved by topic first-place
+count, then a shared rank (`docs/rules.md` §6.3). Those competition reference
+values are fixed separately from the community anchors below. A failed
+competition topic contributes 0 to the total while its raw score remains
+`null`; missing community metric values below remain `null`.
 
 The 12 dimensions: `b0 / bT / AUP / UR / ED` plus seven LLM-judge dimensions
 `PQ / PEA / ER / OU / ECC / SC / CC`.
