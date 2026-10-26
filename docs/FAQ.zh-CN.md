@@ -18,7 +18,7 @@
 
 **模型由谁提供？**
 
-自测阶段由参赛者提供，推荐模型见规则 §4，不作强制限制。正式测评由主办方通过 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` 统一注入，不允许另行指定模型或 endpoint。两阶段均不得在代码中硬编码模型 ID 或地址。
+自测阶段由参赛者提供，推荐使用 `deepseek-v4.1-flash`，不作强制要求。正式测评由主办方通过 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` 统一注入，不允许另行指定模型或 endpoint。两阶段均不得在代码中硬编码模型 ID 或地址。
 
 **LLM 评审是否参与比赛排名？**
 

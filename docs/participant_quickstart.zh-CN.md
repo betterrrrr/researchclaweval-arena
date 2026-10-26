@@ -73,7 +73,7 @@ python3 scripts/validate_schemas.py --manifest myframework/manifest.json
 
 Fullrun wrapper 须遵循 `scripts/runner/` 中的模板。Runner 只读挂载契约与数据，通过 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` 注入模型配置，导出 `WORKSPACE` 与 `DATASET_ROOT`，生成 `input/prompt.txt`，在独立工作目录中启动框架并收集产物。工作路径须从 `WORKSPACE` 读取，不得硬编码。
 
-自测阶段由参赛者提供模型，正式测评由主办方通过相同环境变量配置。两阶段均不得在代码中硬编码模型 ID 或 endpoint。推荐自测模型见规则 §4。
+自测阶段由参赛者提供模型，推荐使用 `deepseek-v4.1-flash`，不作强制要求。正式测评由主办方通过相同环境变量配置。两阶段均不得在代码中硬编码模型 ID 或 endpoint，具体要求见规则 §4。
 
 `FRAMEWORK_NATIVE_LOG_MARKER` 须由框架自身在运行早期输出。退出码为 0 但 `logs/e2e.log` 缺少标记时，仍判为非原生执行。检查命令：`bash scripts/check_native_marker.sh logs/e2e.log`；也可传入运行根目录，并通过第二个参数指定自定义标记。
 

@@ -27,7 +27,7 @@ the same task requirements, model, data splits, and budgets:
 | Task contracts | one per topic: question, metric, data visibility, compute budget |
 | Data splits | frozen, sha256 published in advance; a wrong split is rejected |
 | Official scorer | the same frozen code and data for every submission |
-| Model | self-testing: yours (see rules §4 for a recommended model); official evaluation: injected by the organizer via env vars — this is a *framework* contest |
+| Model | Self-testing: participant-provided; `deepseek-v4.1-flash` is recommended, not required. Official evaluation: supplied by the organizer via environment variables (rules §4). |
 | Experiment count | 2–4 (strategy lines — rules §5.8), written into each contract |
 | Runtime | a unified runner template with container isolation |
 

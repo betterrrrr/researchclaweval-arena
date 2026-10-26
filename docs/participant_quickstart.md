@@ -101,10 +101,10 @@ composes `input/prompt.txt`, launches the framework in a fresh workspace,
 and collects artifacts. Read the workspace path from `WORKSPACE`; do not
 hardcode it.
 
-Participants provide the self-test model. The organizer provides the
-official model through the same environment variables. Neither stage
-permits hardcoded model IDs or endpoints. See rules §4 for the optional
-self-test model recommendation.
+Participants provide the self-test model; `deepseek-v4.1-flash` is recommended
+but not required. The organizer provides the official model through the same
+environment variables. Neither stage permits hardcoded model IDs or endpoints.
+See rules §4.
 
 `FRAMEWORK_NATIVE_LOG_MARKER` must be emitted early by the framework itself.
 Exit code 0 without the marker in `logs/e2e.log` is still non-native.

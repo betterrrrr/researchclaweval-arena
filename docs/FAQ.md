@@ -29,9 +29,9 @@ the overall board; disqualified frameworks are excluded.
 
 **Who provides the model?**
 
-Participants provide their model for self-testing; the recommendation in
-rules §4 is optional. For official evaluation, the organizer supplies
-`OPENAI_BASE_URL`, `OPENAI_API_KEY`, and `OPENAI_MODEL`. An alternative model
+Participants provide their model for self-testing. `deepseek-v4.1-flash` is
+recommended but not required (rules §4). For official evaluation, the organizer
+supplies `OPENAI_BASE_URL`, `OPENAI_API_KEY`, and `OPENAI_MODEL`. An alternative model
 or endpoint is not permitted at that stage. Neither stage permits model IDs
 or endpoints to be hardcoded in framework code.
 
