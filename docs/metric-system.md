@@ -1,116 +1,94 @@
-# Metric System (long-term community leaderboard)
+# Community Leaderboard Metric System
 
-The competition leaderboard uses **objective official scores only** (see
-`docs/rules.md` §6). This document describes the extended 12-dimension metric
-system used by the long-term community leaderboard that runs after the
-competition using the same harness. Community topics and splits are specified
-separately; the three public self-test topics are not the final competition
-evaluation topics.
+This document defines the 12-dimension metric system for the community
+leaderboard maintained after the competition. Community topics and splits
+are specified separately. The three public self-test topics are not the
+final competition evaluation topics.
 
-The competition's overall champion uses an equal-weight mean of normalized
-0–100 official topic scores; tied totals are resolved by topic first-place
-count, then a shared rank (`docs/rules.md` §6.3). Those competition reference
-values are fixed separately from the community anchors below. A failed
-competition topic contributes 0 to the total while its raw score remains
-`null`; missing community metric values below remain `null`.
+Competition rankings use official objective scores normalized to 0–100 and
+averaged with equal weights. Tied totals are resolved by topic first-place
+count, then a shared rank. Competition reference values are specified
+separately from the community anchors below. See `docs/rules.md` §6.3.
 
-The 12 dimensions: `b0 / bT / AUP / UR / ED` plus seven LLM-judge dimensions
+The community dimensions are `b0 / bT / AUP / UR / ED` and
 `PQ / PEA / ER / OU / ECC / SC / CC`.
 
-## 1. Trajectory metrics (deterministic arithmetic, no LLM)
+## 1. Trajectory metrics
 
-Extracted from the run's `experiment_trace.json`. All four are computed by
-plain arithmetic over the recorded trace — no model in the loop:
+The following metrics are calculated from `experiment_trace.json` without
+LLM scoring:
 
-| Dim | What | Notes |
+| Metric | Definition | Reporting requirement |
 |---|---|---|
-| `b0` | baseline-normalized first-experiment score | anchor-relative, see §3 |
-| `bT` | baseline-normalized final/selected-experiment score | anchor-relative |
-| `AUP` | area-under-progress of improvements across experiments | has a `1/N` floor — never averaged across topics; report N alongside any AUP |
-| `UR` | utilization of the allowed experiment budget | |
+| `b0` | Anchor-normalized first-experiment score | Use the reference values in §3 |
+| `bT` | Anchor-normalized final or selected-experiment score | Use the reference values in §3 |
+| `AUP` | Area under experimental progress | Has a `1/N` lower bound; report N and do not average across topics |
+| `UR` | Utilization of the permitted experiment budget | Use the task's declared budget |
 
-Missing values are recorded as `null`, never filled with `0` — an anchor
-value of 0 has real semantics (random-level), so filling would fabricate a
-meaningful-looking score.
+Missing community metric values are recorded as `null`. An anchor score of
+0 represents random-level performance and must not substitute for missing
+evidence. This differs from the competition rule assigning a failed topic
+0 contribution to the total while retaining a `null` raw score.
 
-## 2. ED (experiment-design diversity)
+## 2. Experiment-design diversity
 
-`ED` measures how *methodologically* different the recorded experiments are.
-It is computed by clustering the experiment descriptions: a run whose
-experiments keep re-using one configuration family scores low; a run that
-explored genuinely different approaches scores high.
+`ED` evaluates methodological differences between recorded experiments.
+It groups experiment descriptions by method, distinguishing repeated
+configurations from different approaches. Runs without method descriptions
+cannot be evaluated for this dimension; record `null`.
 
-**Data limitation:** `ED` requires the run to *record* its method choices.
-Runs whose traces carry no per-experiment method descriptions cannot be
-scored — those cells are `null`, not `0`.
+## 3. Normalization anchors
 
-## 3. Anchors
+`b0` and `bT` use fixed anchors in `scoring/metric_anchors.json`:
 
-`b0`/`bT` normalize the raw score against fixed anchors
-(`scoring/metric_anchors.json`) so that 0 has a clear meaning
-(random-level) and topic scales are comparable:
-
-| topic | worst (anchor=0) | best (anchor=1) | scale |
+| Topic | Reference at 0 | Reference at 1 | Scale |
 |---|---|---|---|
-| `tdc_admet_tox` | 0.5 (random AUROC) | 1.0 (perfect AUROC) | linear |
-| `psydefdetect` | 0.125 (random over 8 positive classes) | 1.0 (perfect macro-F1) | linear |
-| `arc_wbe_2026` | 0.075 (random-level estimator) | 1e-06 (near-perfect est.) | log |
+| `tdc_admet_tox` | 0.5, random AUROC | 1.0, perfect AUROC | Linear |
+| `psydefdetect` | 0.125, uniform random over 8 positive classes | 1.0, perfect macro-F1 | Linear |
+| `arc_wbe_2026` | 0.075, random-level estimator | 1e-06, near-perfect estimator | Logarithmic |
 
-> The anchors are a **convention calibrated by the organizer, not an
-> authoritative baseline**. Any citation of these values must carry that
-> caveat.
+These are organizer-defined calibration references, not authoritative
+benchmark baselines. Publications citing them must state this limitation.
+They do not define the reference values for formal competition topics.
 
-## 4. The seven judge dimensions
+## 4. LLM-judge dimensions
 
-For subjective/process dimensions, a unified LLM judge reads the run's
-execution artifacts (logs, trace, report) and scores on frozen rubrics:
+A single judge model evaluates execution artifacts against fixed rubrics:
 
-| Dim | Dimension | Judge sees |
+| Metric | Dimension | Evidence |
 |---|---|---|
-| `PQ` | planning quality / idea quality | `research_idea.json`, log |
-| `PEA` | experimental adequacy (do the experiments test the hypothesis) | trace, logs |
-| `ER` | execution robustness (does the run actually do what it claims) | `e2e.log` |
-| `OU` | output usage (does the report cite what the experiments actually produced) | report + trace |
-| `ECC` | evidence-claim consistency | report + trace + logs |
-| `SC` | state consistency (the run's stage/duty bookkeeping stays coherent) | trace |
-| `CC` | completeness against the framework's own duty list | trace |
+| `PQ` | Research planning and idea quality | `research_idea.json`, logs |
+| `PEA` | Adequacy of experiments for testing the hypothesis | Trace, logs |
+| `ER` | Execution robustness | `e2e.log` |
+| `OU` | Use of experimental outputs in the report | Report, trace |
+| `ECC` | Consistency between evidence and claims | Report, trace, logs |
+| `SC` | Consistency of recorded workflow state | Trace |
+| `CC` | Completion of the framework's declared obligations | Trace |
 
-Operational rules:
+The judge model ID is fixed and published for each evaluation period.
+Credentials and configuration are read from `JUDGE_API_KEY`, `JUDGE_MODEL`,
+and `JUDGE_BASE_URL`; source files contain no credentials or default model ID.
+When execution logs conflict with reports or plans, logs take precedence.
 
-- The judge runs on one unified model for the whole period; the model id is
-  **frozen and published** at leaderboard start.
-- Credentials are read exclusively from environment variables
-  (`JUDGE_API_KEY` / `JUDGE_MODEL` / `JUDGE_BASE_URL`). The source contains
-  no secrets and no default model id.
-- The judge trusts `logs/e2e.log` (the run's raw output stream) above
-  framework-written reports when they conflict.
+### Evaluation limitations
 
-### Known limitations (deliberate, not bugs)
+- LLM scoring has additional execution cost and variability. Differences
+  below the calibrated tie threshold are reported as ties. Judge dimensions
+  do not affect competition rankings.
+- `CC` is relative to obligations inferred from a framework's own run.
+  Cross-framework comparison requires a common stage contract; otherwise,
+  report `CC` as a descriptive column only.
+- For participant-run submissions, the participant controls the submitted
+  logs even when the runner records stdout/stderr in real time. `ER`, `SC`,
+  and `CC` therefore reflect the submitted evidence and do not establish
+  independently observed execution. Distinguish these submissions from
+  organizer-run evaluations with host-captured logs.
 
-- **Noise:** the single-call judge path measures a mean absolute difference
-  around 0.052 with ~84% agreement on re-scored samples. Rank differences
-  below the calibrated tie threshold are reported as ties.
-- **Cost:** the container-agent paths (ER/SC/CC) cost on the order of
-  47K tokens per run. This is a real per-run cost; the competition
-  leaderboard deliberately does not include judge dimensions.
-- **`CC` is framework-relative:** the judge derives the duty list from the
-  run itself, so `CC` is comparable *within* a framework family, not across
-  frameworks. Either a fixed stage contract is issued by the organizer, or
-  `CC` is demoted to a display-only column.
-- **Submitted-evidence caveat:** when *participants* run the harness
-  themselves and submit artifacts (as in this competition), the log is the
-  runner wrapper's live-tee of the framework's own stdout/stderr, submitted
-  alongside the artifacts — faithful, but written by participant-owned code,
-  not by the host. ER/SC/CC then measure the *quality of the submitted
-  evidence*, not the execution itself. The community leaderboard's judge
-  runs are host-captured again; this caveat applies only to fan-made
-  submissions and should be stated whenever such numbers are cited.
+## 5. Comparability and missing values
 
-## 5. What is and is not comparable
-
-- Official scores from the competition are objective-scorer numbers on the
-  frozen split. They are comparable to each other.
-- Judge-dimension numbers are not comparable to official scores in any
-  arithmetic sense.
-- AUP is not averaged across topics (`1/N` floor).
-- No missing cell is ever imputed with 0.
+- Compare official raw scores within the same topic and fixed data split.
+  Competition totals combine scores only through the normalization defined
+  in the competition rules.
+- Do not combine judge scores arithmetically with official task scores.
+- Do not average `AUP` across topics; its lower bound depends on N.
+- Record missing community metric values as `null`, not 0.

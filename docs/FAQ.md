@@ -1,146 +1,161 @@
-# FAQ
+# Frequently Asked Questions
 
-## The competition
+[中文](FAQ.zh-CN.md). This page explains participation and self-testing.
+The rules in `docs/rules.md` take precedence.
 
-**Q: Are the three public topics used for final scoring?**
-No. They are for participant self-testing, and you can run and debug them
-as often as needed. Final scoring uses other topics, run and scored by the
-organizer. Self-test scores do not count toward final rankings. See
-`docs/rules.md` §0 and §2.
+## Competition
 
-**Q: Is the leaderboard a single merged score?**
-Yes. Normalize each official topic score to 0–100 using reference values
-fixed before evaluation, then take the equal-weight mean. The highest total
-wins the overall championship. Tied totals are resolved by the number of
-topic first places; if that also ties, the rank is shared. Per-topic rankings
-are also published. Public self-test scores do not count. See `docs/rules.md`
-§6.3 for the formula and comparison precision.
+**Are the three public topics used for final scoring?**
 
-**Q: What happens if a topic fails or has no valid result?**
-Its contribution to the total is 0, and it stays in the fixed topic count.
-Do not average only successful topics. Record the raw score as `null` and
-retain the outcome status. At least one valid official topic result is
-required to enter the overall board; disqualified frameworks are excluded.
+The public topics are for development and self-testing and may be run
+repeatedly. Official evaluation uses other topics, run and scored by the
+organizer. Self-test scores do not count toward final rankings. See rules
+§0 and §2.
 
-**Q: Who provides the model?**
-Two stages. Self-testing (before submission): you bring your own model —
-the organizer does not restrict it (the organizer's recommended self-test
-model is named in rules §4). Official evaluation (submission
-scoring): the organizer injects the model via `OPENAI_BASE_URL` /
-`OPENAI_API_KEY` / `OPENAI_MODEL`; bringing your own model or endpoint at
-that stage is grounds for rejection. This is a framework contest, not a
-model contest (rules §4).
+**How are the overall score and champion determined?**
 
-**Q: Why is there no judge/LLM-scoring on the board?**
-The competition board uses objective official scores only. The 7-dimension
-LLM judge and ED belong to the long-term community leaderboard: they are
-noisy, expensive, and in a submit-artifacts mode they would measure evidence
-quality rather than execution (rules §6.2, appendix A).
+Normalize each official topic score to 0–100 using reference values fixed
+before evaluation, then take the equal-weight mean. The highest total wins.
+Tied totals are resolved by topic first-place count; if that also ties, the
+rank is shared. Per-topic rankings are also published. See rules §6.3 for
+the formula and comparison precision.
+
+**How are failed or missing results handled?**
+
+The topic contributes 0 to the total and remains in the fixed topic count.
+Record the raw score as `null` and retain the outcome status. Do not average
+only successful topics. At least one valid official result is required for
+the overall board; disqualified frameworks are excluded.
+
+**Who provides the model?**
+
+Participants provide their model for self-testing; the recommendation in
+rules §4 is optional. For official evaluation, the organizer supplies
+`OPENAI_BASE_URL`, `OPENAI_API_KEY`, and `OPENAI_MODEL`. An alternative model
+or endpoint is not permitted at that stage. Neither stage permits model IDs
+or endpoints to be hardcoded in framework code.
+
+**Do LLM-judge scores affect competition rankings?**
+
+Competition rankings use official objective scores. The seven LLM-judge
+dimensions and ED belong to the community leaderboard. Their use is subject
+to evaluation cost, scoring variability, and evidence provenance. See rules
+§6.2 and Appendix A.
 
 ## Data
 
-**Q: Where do I get the data?**
-You download it yourself and verify sha256 — `scripts/setup_datasets.sh`.
-The organizer does not redistribute datasets (rules §3.2). If
+**How are datasets obtained?**
+
+Use `scripts/setup_datasets.sh` to download from the original sources and
+verify SHA-256. The organizer does not redistribute datasets. If
 `huggingface.co` is unreachable, set `HF_ENDPOINT=https://hf-mirror.com`.
+See rules §3.2.
 
-**Q: Is PsyDefDetect really usable?**
-Yes, under `cc-by-nc-4.0`. The competition is organized for non-commercial
-purposes; make sure your own use complies before downloading.
+**What license applies to PsyDefDetect?**
 
-**Q: What split do I have to use?**
-The frozen canonical splits. `split_sha256` must match byte for byte; any
-re-splitting is a rejection. For PsyDefDetect the canonical split is a
-dialogue-level, leakage-free split distinct from the dataset's official
-record-level one (rules §3.3).
+The data uses `cc-by-nc-4.0`. The competition is non-commercial, and
+participants' data use must comply with the license.
 
-## Scoring
+**Which data split is required?**
 
-**Q: My TDC score is exactly 0.**
-Check `predictions.csv` `sample_id` values against `public/test.csv` —
-`sample_id` must be taken verbatim from that file, never re-built
-(`hERG` endpoint → `HERG_` prefix). One mismatched id → zero matches and a
-zero score (rules §5.6).
+Use the frozen canonical split. `split_sha256` must match the published
+value exactly. PsyDefDetect uses a dialogue-level split, distinct from the
+dataset's record-level split. See rules §3.3.
 
-**Q: My ARC estimator was rejected.**
-The official adapter fails closed: `predict(self, mlp)` must return a real
-`(32, 256)` float array. Constants, broadcast, scalar, zero-filled,
-placeholder, or pasted log outputs are inadmissible (ARC contract,
-"Required Outputs"). Also check the signature — some estimators omit the `budget`
-parameter; the adapter probes the signature and supports both.
+## Scoring and validation
 
-**Q: Why doesn't my ARC run have `b0`/`bT`?**
-ARC is the one topic without a truth value for the framework. Numeric
-`framework_visible_validation` self-evaluation records in
-`experiment_trace.json` are required to compute those (rules §3.4); without
-them the extended dimensions fall back to the judge's ordinal path.
+**How should a TDC sample-ID mismatch be resolved?**
 
-**Q: My run exited 0 but scored nothing.**
-Most likely the native marker is missing: `FRAMEWORK_NATIVE_LOG_MARKER` must
-be printed by *your framework's own execution* into the run log, early in the
-run (rules §5.5). A wrapper printing it on the framework's behalf is judged
-non-native. Self-check with `bash scripts/check_native_marker.sh logs/e2e.log`.
+Use `sample_id` directly from `public/test.csv`; do not reconstruct it.
+The `hERG` endpoint uses the `HERG_` ID prefix. The prediction ID and endpoint
+keys must match the test file exactly. A mismatch is rejected by validation
+or scoring and does not produce a valid raw score of 0. See rules §5.6.
 
-**Q: What counts as the 2–4 experiments?**
-Experiments are counted as *strategy lines*: a materially different
-configuration cluster (differing in algorithm family / features /
-architecture / overall hyperparameter-search design). Retries, seed-only
-repeats, and small tuning inside one line do not count; failed setup
-attempts never count; a configuration that was evaluated and then crashed or
-timed out still counts for its line (rules §5.8, contracts' execution
-budgets).
+**What output must an ARC estimator produce?**
 
-**Q: Can I submit a self-computed score?**
-No. Self-reported scores never enter the board — placeholder values,
-self-implemented metrics, and wrong splits are all rejection grounds
-(rules §6.1, §8).
+`predict(mlp)` must return a `(32, 256)` numeric array satisfying the
+contract. The adapter supports implementations with or without a `budget`
+parameter. It rejects incorrect shapes, non-finite values, constants,
+zero-filled, broadcast, scalar, and placeholder outputs. See the ARC
+contract's Required Outputs.
 
-## Tooling
+**What should be checked when ARC `b0` or `bT` is missing?**
 
-**Q: Is there a download bundle for participants?**
-Yes — the GitHub releases carry `researchclaweval-arena-<version>.zip` /
-`.tar.gz` (exact copies of the tagged tree, verified sha256 in the release
-notes). Unzip anywhere, run `bash scripts/setup_datasets.sh`, and follow
-`docs/participant_quickstart.md`. Datasets are never bundled — you download
-and verify them yourself.
+Check for numeric `framework_visible_validation` records in
+`experiment_trace.json`. ARC provides ground truth for visible validation;
+scoring-set ground truth remains organizer-side. Without numeric records,
+`b0` and `bT` cannot be computed from those records, and extended evaluation
+uses the judge's ordinal path. See rules §3.4.
 
-**Q: What is the runner?**
-A template wrapper (`scripts/runner/`) that mounts contract + dataset
-read-only, injects the model env, exports `WORKSPACE` / `DATASET_ROOT`,
-composes the task input at `input/prompt.txt` (contract + execution budget +
-task summary; rules §5.7), runs your framework natively in a fresh
-workspace, and collects `logs/e2e.log` and the artifacts. You must use it
-rather than your own ad-hoc orchestration so the artifacts are attributable
-(rules §5.4).
+**Does exit code 0 establish a valid run?**
 
-**Q: What goes into the adapter manifest?**
-`templates/example-adapter/manifest.json` — validated against
-`schemas/adapter.schema.json` (framework id, name, upstream repo, license,
-native entrypoint, required env/images, patches). Fill every TODO, that's
-the entire integration surface. Validate locally with
-`python3 scripts/validate_schemas.py --manifest <your-manifest.json>`.
+Exit status does not replace artifact and native-execution validation.
+`FRAMEWORK_NATIVE_LOG_MARKER` must be emitted early by the framework itself,
+not by its outer wrapper. Check with
+`bash scripts/check_native_marker.sh logs/e2e.log`. See rules §5.5.
 
-**Q: What exactly is `resource_budget` in my trace?**
-The declared compute budget, recorded verbatim: the audit compares it byte
-for byte. The canonical dict is documented in
-`contracts/tdc_admet_tox_compute_budget.md` (with a copyable JSON example)
-and machine-readable in `scoring/resource_budget.anchors.json` — copy the
-value from there, never from decoded error messages. It includes
-`network_policy: "injected_llm_relay_only"` (rules §5.4).
+**How are the 2–4 experiments counted?**
 
-**Q: What if the network flaps mid-run?**
-The wall-clock budgets in the contracts keep running — a gateway blip is
-not an exemption. Self-testing advice: prove the link with a tiny
-experiment first, checkpoint your state, and resume from checkpoints;
-configure client-side retries/backoff on your side (there is no official
-knob on the injected relay; the community-board judge has its own retries,
-rules §5.4).
+Count strategy lines that differ materially in algorithm family, feature
+representation, architecture, or overall hyperparameter-search design.
+Retries, seed-only repeats, and minor tuning within a line do not add a
+line. Setup attempts without training or evaluation are logged only.
+Configurations evaluated before a crash or timeout still count within their
+line. See rules §5.8.
 
-**Q: Does the judge pipeline need a key from me?**
-The judge runs organizer-side. The code reads `JUDGE_API_KEY` /
-`JUDGE_MODEL` / `JUDGE_BASE_URL` from the environment; there are no secrets
-and no default model id in the source.
+**Are participant-computed scores accepted?**
 
-**Q: I found a bug in a scorer glue script.**
-Open an issue with the topic, the script name, and a minimal reproduction.
-Do not email raw dataset files or keys to anyone.
+Self-scores support development and debugging only. The organizer computes
+official results using the required metrics and fixed splits. See rules
+§6.1 and §8.
+
+## Tools and execution
+
+**Are release bundles available?**
+
+GitHub Releases provides `researchclaweval-arena-<version>.zip` and `.tar.gz`
+for the tagged source tree, with checksums in the release notes. Extract a
+bundle and follow `docs/participant_quickstart.md`. Datasets are not bundled
+and must be obtained through the download scripts.
+
+**What does the runner do?**
+
+Templates in `scripts/runner/` mount contracts and datasets read-only,
+inject model configuration, export `WORKSPACE` and `DATASET_ROOT`, compose
+`input/prompt.txt`, launch the framework in a fresh workspace, and collect
+`logs/e2e.log` and artifacts. Runs must use the official template. See rules
+§5.4 and §5.7.
+
+**What belongs in the adapter manifest?**
+
+`templates/example-adapter/manifest.json` declares the framework ID, name,
+upstream repository, license, native entrypoint, required environment
+variables, images, and patches. Replace the placeholders and validate with
+`python3 scripts/validate_schemas.py --manifest <manifest-path>` against
+`schemas/adapter.schema.json`.
+
+**How should trace `resource_budget` be populated?**
+
+Use the complete budget object specified by the contract. For TDC, the
+requirements and example are in `contracts/tdc_admet_tox_compute_budget.md`;
+the machine-readable value is in `scoring/resource_budget.anchors.json`.
+It includes `network_policy: "injected_llm_relay_only"`. Validation requires
+an exact match; error messages should not be used to reconstruct the object.
+
+**Does a network interruption pause the budget?**
+
+Contract wall-clock limits continue to apply, without extra time. Verify
+connectivity before self-testing, save checkpoints, and configure retries,
+backoff, and recovery in the framework client. The injected relay has no
+shared retry setting; the community judge has its own retry mechanism.
+See rules §5.4.
+
+**Who configures judge credentials?**
+
+The organizer runs the judge with `JUDGE_API_KEY`, `JUDGE_MODEL`, and
+`JUDGE_BASE_URL`. Source files contain no credentials or default model ID.
+
+**How should a scoring-tool issue be reported?**
+
+Open an issue with the topic, script name, and minimal reproduction steps.
+Do not include raw datasets or credentials in reproduction material.
