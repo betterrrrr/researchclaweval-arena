@@ -9,10 +9,18 @@ organizer. Self-test scores do not count toward final rankings. See
 `docs/rules.md` §0 and §2.
 
 **Q: Is the leaderboard a single merged score?**
-No. Official evaluation has a separate ranking for each topic. Different
-task metrics are not added together, and there is no overall champion.
-Public self-test scores do not enter the final rankings. See `docs/rules.md`
-§6.3 and `docs/announcement.md` §6.2.
+Yes. Normalize each official topic score to 0–100 using reference values
+fixed before evaluation, then take the equal-weight mean. The highest total
+wins the overall championship. Tied totals are resolved by the number of
+topic first places; if that also ties, the rank is shared. Per-topic rankings
+are also published. Public self-test scores do not count. See `docs/rules.md`
+§6.3 for the formula and comparison precision.
+
+**Q: What happens if a topic fails or has no valid result?**
+Its contribution to the total is 0, and it stays in the fixed topic count.
+Do not average only successful topics. Record the raw score as `null` and
+retain the outcome status. At least one valid official topic result is
+required to enter the overall board; disqualified frameworks are excluded.
 
 **Q: Who provides the model?**
 Two stages. Self-testing (before submission): you bring your own model —

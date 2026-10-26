@@ -48,9 +48,17 @@ for final scoring.
 | [PsyDefDetect](contracts/psydefdetect_contract.md) | Detect psychological defense mechanisms in supportive conversations | macro-F1 ↑ | 5.4 MB |
 | [ARC-WBE-2026](contracts/arc_wbe_2026_contract.md) | Estimate per-layer activations from a Transformer's weight matrices | adjusted final-layer score ↓ | 907 MB |
 
-Final rankings use the organizer's scores on other topics, with a separate
-ranking for each evaluation topic. Scores from different metrics are not
-added together, and there is no overall champion.
+Final rankings use the organizer's scores on other topics. The competition
+awards an **overall champion** and also publishes per-topic rankings:
+
+- Normalize each official topic score to 0–100 using reference values fixed
+  and published before official evaluation, then take the equal-weight mean.
+- The highest total wins. Tied totals are resolved by the number of topic
+  first places; if that also ties, the overall rank is shared.
+- Failed or missing valid results contribute 0 and remain in the fixed topic
+  count. Reference values do not depend on competitors' scores.
+
+See [rules §6.3](docs/rules.md#63-排名) for the formula and tie rules.
 
 ---
 
